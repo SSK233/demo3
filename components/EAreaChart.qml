@@ -184,10 +184,10 @@ Rectangle {
             anchors.centerIn: parent
             text: {
                 switch(root.lineStyle) {
-                    case EAreaChart.LineStyle.Smooth: return "S"
-                    case EAreaChart.LineStyle.Linear: return "L"
-                    case EAreaChart.LineStyle.Step: return "St"
-                    default: return "S"
+                    case EAreaChart.LineStyle.Smooth: return "顺滑"
+                    case EAreaChart.LineStyle.Linear: return "直线"
+                    case EAreaChart.LineStyle.Step: return "阶梯"
+                    default: return "顺滑"
                 }
             }
             font.pixelSize: 10
