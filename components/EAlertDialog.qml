@@ -91,12 +91,14 @@ Item {
                     text: cancelText
                     backgroundVisible: true
                     iconCharacter: "\uf00d" // X 图标
+                    visible: cancelText !== ""
                     onClicked: { dialogRoot.cancel(); dialogRoot.close() }
                 }
                 Components.EButton {
                     text: confirmText
                     backgroundVisible: true
                     iconCharacter: "\uf00c" // 勾图标
+                    visible: confirmText !== ""
                     onClicked: { dialogRoot.confirm(); dialogRoot.close() }
                 }
             }

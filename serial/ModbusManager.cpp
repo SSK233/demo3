@@ -11,6 +11,10 @@ ModbusManager::ModbusManager(QObject *parent)
     , m_current(0.0)
     , m_power(0.0)
     , m_connected(false)
+    , m_fanState(0)
+    , m_highTempState(0)
+    , m_hasFanStateData(false)
+    , m_hasHighTempData(false)
     , m_pendingReads(0)
 {
     m_modbusMaster = new QModbusRtuSerialMaster(this);
@@ -117,11 +121,13 @@ void ModbusManager::readAllRegisters()
         return;
     }
     
-    m_pendingReads = 3;
+    m_pendingReads = 5;
     
     readHoldingRegister(VOLTAGE_SLAVE_ADDRESS, VOLTAGE_REGISTER_ADDRESS);
     readHoldingRegister(CURRENT_SLAVE_ADDRESS, CURRENT_REGISTER_ADDRESS);
     readHoldingRegister(POWER_SLAVE_ADDRESS, POWER_REGISTER_ADDRESS);
+    readHoldingRegister(FAN_STATE_SLAVE_ADDRESS, FAN_STATE_REGISTER_ADDRESS);
+    readHoldingRegister(HIGH_TEMP_SLAVE_ADDRESS, HIGH_TEMP_REGISTER_ADDRESS);
 }
 
 void ModbusManager::readHoldingRegister(int slaveAddress, int registerAddress)
@@ -167,6 +173,20 @@ void ModbusManager::onReadReady()
             } else if (slaveAddress == POWER_SLAVE_ADDRESS && registerAddress == POWER_REGISTER_ADDRESS) {
                 m_power = rawValue * 0.01;
                 emit powerChanged();
+            } else if (slaveAddress == FAN_STATE_SLAVE_ADDRESS && registerAddress == FAN_STATE_REGISTER_ADDRESS) {
+                m_fanState = rawValue;
+                if (!m_hasFanStateData) {
+                    m_hasFanStateData = true;
+                    emit hasFanStateDataChanged();
+                }
+                emit fanStateChanged();
+            } else if (slaveAddress == HIGH_TEMP_SLAVE_ADDRESS && registerAddress == HIGH_TEMP_REGISTER_ADDRESS) {
+                m_highTempState = rawValue;
+                if (!m_hasHighTempData) {
+                    m_hasHighTempData = true;
+                    emit hasHighTempDataChanged();
+                }
+                emit highTempStateChanged();
             }
         }
     } else {

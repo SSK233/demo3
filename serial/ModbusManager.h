@@ -49,6 +49,20 @@ constexpr int FAN_SLAVE_ADDRESS = 1;//从站地址1
 constexpr int FAN_REGISTER_ADDRESS = 1;//寄存器地址1
 
 /**
+ * @brief 风机状态读取相关常量定义
+ * @details 定义读取风机状态的Modbus配置
+ */
+constexpr int FAN_STATE_SLAVE_ADDRESS = 1;//从站地址1
+constexpr int FAN_STATE_REGISTER_ADDRESS = 2;//寄存器地址2
+
+/**
+ * @brief 高温报警状态读取相关常量定义
+ * @details 定义读取高温报警状态的Modbus配置
+ */
+constexpr int HIGH_TEMP_SLAVE_ADDRESS = 1;//从站地址1
+constexpr int HIGH_TEMP_REGISTER_ADDRESS = 3;//寄存器地址3
+
+/**
  * @brief 卸载控制相关常量定义
  * @details 定义卸载控制的Modbus配置
  */
@@ -62,6 +76,10 @@ class ModbusManager : public QObject
     Q_PROPERTY(double current READ current NOTIFY currentChanged)
     Q_PROPERTY(double power READ power NOTIFY powerChanged)
     Q_PROPERTY(bool connected READ connected NOTIFY connectedChanged)
+    Q_PROPERTY(int fanState READ fanState NOTIFY fanStateChanged)
+    Q_PROPERTY(int highTempState READ highTempState NOTIFY highTempStateChanged)
+    Q_PROPERTY(bool hasFanStateData READ hasFanStateData NOTIFY hasFanStateDataChanged)
+    Q_PROPERTY(bool hasHighTempData READ hasHighTempData NOTIFY hasHighTempDataChanged)
 
 public:
     explicit ModbusManager(QObject *parent = nullptr);
@@ -71,6 +89,10 @@ public:
     double current() const { return m_current; }
     double power() const { return m_power; }
     bool connected() const { return m_connected; }
+    int fanState() const { return m_fanState; }
+    int highTempState() const { return m_highTempState; }
+    bool hasFanStateData() const { return m_hasFanStateData; }
+    bool hasHighTempData() const { return m_hasHighTempData; }
 
     Q_INVOKABLE bool connectToPort(const QString &portName, int baudRate = 9600, int parity = 0);
     Q_INVOKABLE void disconnectPort();
@@ -88,6 +110,10 @@ signals:
     void currentChanged();
     void powerChanged();
     void connectedChanged();
+    void fanStateChanged();
+    void highTempStateChanged();
+    void hasFanStateDataChanged();
+    void hasHighTempDataChanged();
     void errorOccurred(const QString &error);
 
 private slots:
@@ -103,6 +129,10 @@ private:
     double m_current;
     double m_power;
     bool m_connected;
+    int m_fanState;
+    int m_highTempState;
+    bool m_hasFanStateData;
+    bool m_hasHighTempData;
     int m_pendingReads;
 
     void readHoldingRegister(int slaveAddress, int registerAddress);

@@ -41,6 +41,7 @@ Page {
         }
     }
 
+    
     /**
      * @brief Modbus管理器
      * 负责Modbus RTU通信，读取电压、电流、功率数据
@@ -117,6 +118,86 @@ Page {
         onToggled: function(checked) {
             modbusManager.writeFanState(checked)
             console.log("风机开关状态:", checked ? "开启(1)" : "关闭(0)")
+        }
+    }
+
+    /**
+     * @brief 风机状态指示灯
+     * 显示风机的实际开关状态（读取从站1寄存器2）
+     */
+    ECard {
+        id: fanStatusIndicator
+        width: 140
+        height: 40
+        cardColor: theme.secondaryColor
+        radius: 20
+        padding: 10
+        shadowEnabled: true
+        anchors.top: parent.top
+        anchors.topMargin: 16
+        anchors.right: fanSwitch.left
+        anchors.rightMargin: 24
+
+        RowLayout {
+            spacing: 8
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            Rectangle {
+                width: 16
+                height: 16
+                radius: 8
+                color: !modbusManager.hasFanStateData ? (theme.isDark ? "#555555" : "#CCCCCC") : (modbusManager.fanState === 1 ? (theme.isDark ? "#66BB6A" : "#4CAF50") : (theme.isDark ? "#EF5350" : "#F44336"))
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            Text {
+                text: !modbusManager.hasFanStateData ? "风机状态：未就绪" : (modbusManager.fanState === 1 ? "风机状态：运行" : "风机状态：停止")
+                color: theme.textColor
+                font.pixelSize: 12
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter
+            }
+        }
+    }
+    
+    /**
+     * @brief 高温报警状态指示灯
+     * 显示设备高温报警状态（读取从站1寄存器3）
+     */
+    ECard {
+        id: highTempIndicator
+        width: 160
+        height: 40
+        cardColor: theme.secondaryColor
+        radius: 20
+        padding: 10
+        shadowEnabled: true
+        anchors.top: parent.top
+        anchors.topMargin: 16
+        anchors.right: fanStatusIndicator.left
+        anchors.rightMargin: 8
+
+        RowLayout {
+            spacing: 8
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            Rectangle {
+                width: 16
+                height: 16
+                radius: 8
+                color: !modbusManager.hasHighTempData ? (theme.isDark ? "#555555" : "#CCCCCC") : (modbusManager.highTempState === 0 ? (theme.isDark ? "#66BB6A" : "#4CAF50") : (theme.isDark ? "#EF5350" : "#F44336"))
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            Text {
+                text: !modbusManager.hasHighTempData ? "温度状态：未就绪" : (modbusManager.highTempState === 0 ? "温度状态：正常" : "温度状态：高温报警")
+                color: theme.textColor
+                font.pixelSize: 12
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter
+            }
         }
     }
 
@@ -538,11 +619,26 @@ Page {
             var voltageValue = parseFloat(voltageInput.text)
             var currentValue = parseFloat(currentInput.text)
             if (!isNaN(voltageValue) && !isNaN(currentValue)) {
-                modbusManager.writeVoltageAndCurrent(voltageValue, currentValue)
-                console.log("载入: 电压 -> 寄存器50, 电流 -> 寄存器51 (单次发送)")
+                loadConfirmDialog.message = "确定要载入以下数值？\n电压: " + voltageValue + " V\n电流: " + currentValue + " A"
+                loadConfirmDialog.open()
             } else {
                 console.log("请输入有效的电压和电流值")
             }
+        }
+    }
+
+    /** @brief 载入确认对话框 */
+    EAlertDialog {
+        id: loadConfirmDialog
+        title: "确认载入"
+        message: ""
+        confirmText: "确定"
+        cancelText: "取消"
+        onConfirm: {
+            var voltageValue = parseFloat(voltageInput.text)
+            var currentValue = parseFloat(currentInput.text)
+            modbusManager.writeVoltageAndCurrent(voltageValue, currentValue)
+            console.log("载入: 电压 -> 寄存器50, 电流 -> 寄存器51 (单次发送)")
         }
     }
 
@@ -564,17 +660,30 @@ Page {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: -20            //调整左右移动的位置，减号后面的数字增加则向左移动
         onClicked: {
+            unloadConfirmDialog.open()
+        }
+    }
+
+    /** @brief 卸载确认对话框 */
+    EAlertDialog {
+        id: unloadConfirmDialog
+        title: "确认卸载"
+        message: "确定要执行卸载操作吗？"
+        confirmText: "确定"
+        cancelText: "取消"
+        onConfirm: {
             modbusManager.writeUnload()
             console.log("卸载: 从站1寄存器35写1")
         }
     }
 
     /** @brief 功率超限警告对话框 */
-    MessageDialog {
+    EAlertDialog {
         id: powerWarningDialog
         title: "警告"
-        text: "输入的电压 × 电流不能超过 30000W（30KW），已自动调整数值。"
-        buttons: MessageDialog.Ok
+        message: "输入的电压 × 电流不能超过 30000W（30KW），已自动调整数值。"
+        confirmText: "确定"
+        cancelText: ""
     }
 
     /** @brief 动画窗口包装器 - 用于页面切换动画效果 */
