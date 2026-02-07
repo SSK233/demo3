@@ -7,7 +7,7 @@ echo --- EvolveUI Packaging Script ---
 echo.
 
 REM Set your project name here
-set PROJECT_NAME=demo1
+set PROJECT_NAME=demo3
 
 REM --- Configuration ---
 set BUILD_DIR=build
