@@ -382,186 +382,6 @@ Page {
         }
     }
 
-    // ========================================================================
-    // 电流值设置区域
-    // ========================================================================
-
-    /** @brief 当前选中的位掩码值（用于按钮组合选择） */
-    property int selectedValue: 0
-
-    /** @brief 按钮节流锁，防止快速连续点击 */
-    property bool throttleBlocked: false
-
-    /**
-     * @brief 根据位掩码获取按钮背景色
-     * @param bitMask 位掩码值
-     * @return 如果当前值包含该位，返回高亮色；否则返回普通色
-     */
-    function getButtonColor(bitMask) {
-        return (selectedValue & bitMask) ? theme.focusColor : theme.secondaryColor
-    }
-
-    /**
-     * @brief 按钮节流定时器
-     * 200ms内只响应第一次点击，防止重复触发
-     */
-    Timer {
-        id: buttonThrottleTimer
-        interval: 200
-        repeat: false
-        onTriggered: {
-            throttleBlocked = false
-        }
-    }
-
-    /**
-     * @brief 节流点击处理函数
-     * @param bitMask 要切换的位掩码
-     * 在200ms内，只有第一次点击会生效，后续点击被忽略
-     * 使用异或运算切换对应位的状态
-     */
-    function throttledButtonClick(bitMask) {
-        if (throttleBlocked) {
-            return
-        }
-        throttleBlocked = true
-        selectedValue ^= bitMask
-        buttonThrottleTimer.start()
-    }
-
-    /**
-     * @brief 位值按钮行
-     * 用于二进制位选择（1, 2, 4, 8, 16, 32, 64）
-     * 每个按钮代表一个二进制位，点击切换该位的状态
-     */
-    Row {
-        id: valueButtonsRow
-        spacing: 12
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.horizontalCenterOffset: -80
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: -90
-
-        /** 位0按钮 - 值为1 */
-        EButton {
-            id: btn1
-            text: "1"
-            size: "m"
-            width: 48
-            height: 48
-            radius: 24
-            containerColor: getButtonColor(1)
-            textColor: theme.textColor
-            shadowEnabled: true
-            onClicked: throttledButtonClick(1)
-        }
-
-        /** 位1按钮 - 值为2 */
-        EButton {
-            id: btn2
-            text: "2"
-            size: "m"
-            width: 48
-            height: 48
-            radius: 24
-            containerColor: getButtonColor(2)
-            textColor: theme.textColor
-            shadowEnabled: true
-            onClicked: throttledButtonClick(2)
-        }
-
-        /** 位2按钮 - 值为4 */
-        EButton {
-            id: btn4
-            text: "4"
-            size: "m"
-            width: 48
-            height: 48
-            radius: 24
-            containerColor: getButtonColor(4)
-            textColor: theme.textColor
-            shadowEnabled: true
-            onClicked: throttledButtonClick(4)
-        }
-
-        /** 位3按钮 - 值为8 */
-        EButton {
-            id: btn8
-            text: "8"
-            size: "m"
-            width: 48
-            height: 48
-            radius: 24
-            containerColor: getButtonColor(8)
-            textColor: theme.textColor
-            shadowEnabled: true
-            onClicked: throttledButtonClick(8)
-        }
-
-        /** 位4按钮 - 值为16 */
-        EButton {
-            id: btn16
-            text: "16"
-            size: "m"
-            width: 48
-            height: 48
-            radius: 24
-            containerColor: getButtonColor(16)
-            textColor: theme.textColor
-            shadowEnabled: true
-            onClicked: throttledButtonClick(16)
-        }
-
-        /** 位5按钮 - 值为32 */
-        EButton {
-            id: btn32
-            text: "32"
-            size: "m"
-            width: 48
-            height: 48
-            radius: 24
-            containerColor: getButtonColor(32)
-            textColor: theme.textColor
-            shadowEnabled: true
-            onClicked: throttledButtonClick(32)
-        }
-
-        /** 位6按钮 - 值为64 */
-        EButton {
-            id: btn64
-            text: "64"
-            size: "m"
-            width: 48
-            height: 48
-            radius: 24
-            containerColor: getButtonColor(64)
-            textColor: theme.textColor
-            shadowEnabled: true
-            onClicked: throttledButtonClick(64)
-        }
-    }
-
-    /**
-     * @brief 中央滑块组件
-     * 用于精确设置电流值，范围0-127
-     */
-    ESlider {
-        id: centralSlider
-        text: "输入电流I/A "
-        width: 450
-        minimumValue: 0
-        maximumValue: 127
-        decimals: 0
-        stepSize: 1
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.horizontalCenterOffset: -80
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: -30
-        onUserValueChanged: {
-            console.log("Slider value changed:", value)
-        }
-    }
-
     /**
      * @brief 载入按钮
      * 将滑块当前值应用到设备
@@ -575,12 +395,11 @@ Page {
         textColor: theme.textColor
         iconColor: theme.textColor
         shadowEnabled: true
-        anchors.top: centralSlider.bottom
-        anchors.topMargin: 20
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.horizontalCenterOffset: -140
+        anchors.horizontalCenterOffset: -60
+        anchors.verticalCenter: parent.verticalCenter
         onClicked: {
-            console.log("载入电流值:", centralSlider.value)
+            console.log("载入电流值")
         }
     }
 
@@ -597,10 +416,9 @@ Page {
         textColor: theme.textColor
         iconColor: theme.textColor
         shadowEnabled: true
-        anchors.top: centralSlider.bottom
-        anchors.topMargin: 20
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.horizontalCenterOffset: -20
+        anchors.horizontalCenterOffset: 60
+        anchors.verticalCenter: parent.verticalCenter
         onClicked: {
             console.log("卸载电流值")
         }
