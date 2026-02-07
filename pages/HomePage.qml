@@ -161,7 +161,7 @@ Page {
         anchors.topMargin: 8
         anchors.right: parent.right
         anchors.rightMargin: 16
-        onSelectionChanged: {
+        onSelectionChanged: function(index) {
             selectedSerialPortIndex = index
         }
     }
@@ -248,7 +248,7 @@ Page {
         anchors.topMargin: 8
         anchors.right: parent.right
         anchors.rightMargin: 16
-        onToggled: {
+        onToggled: function(checked) {
             if (checked) {
                 if (selectedSerialPortIndex >= 0 && serialPortDropdown.model[selectedSerialPortIndex]) {
                     var portName = serialPortDropdown.model[selectedSerialPortIndex].text

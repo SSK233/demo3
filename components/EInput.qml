@@ -28,6 +28,75 @@ Item {
     property bool enabled: true
     property bool backgroundVisible: true  // 背景显示控制
 
+    MouseArea {
+        id: outsideClickArea
+        anchors.fill: parent
+        propagateComposedEvents: true
+        z: 999
+        onClicked: (mouse)=> {
+            var pos = mapToItem(root, mouse.x, mouse.y)
+            if (!root.contains(pos)) {
+                textField.focus = false
+            }
+            mouse.accepted = false
+        }
+    }
+
+    property Window windowRef: null
+
+    Component.onCompleted: {
+        windowRef = Window.window
+        if (windowRef) {
+            outsideClickArea.anchors.fill = undefined
+            outsideClickArea.parent = windowRef.contentItem
+            outsideClickArea.width = windowRef.width
+            outsideClickArea.height = windowRef.height
+            outsideClickArea.visible = textField.activeFocus
+        }
+    }
+
+    Connections {
+        target: textField
+        function onActiveFocusChanged() {
+            if (outsideClickArea.parent) {
+                outsideClickArea.visible = textField.activeFocus
+            }
+        }
+    }
+
+    Timer {
+        id: windowBindTimer
+        interval: 100
+        repeat: false
+        running: !windowRef
+        onTriggered: {
+            if (Window.window && !windowRef) {
+                windowRef = Window.window
+                if (windowRef) {
+                    outsideClickArea.anchors.fill = undefined
+                    outsideClickArea.parent = windowRef.contentItem
+                    outsideClickArea.width = windowRef.width
+                    outsideClickArea.height = windowRef.height
+                    outsideClickArea.visible = textField.activeFocus
+                }
+            }
+        }
+    }
+
+    Connections {
+        target: windowRef
+        function onWidthChanged() {
+            if (windowRef && outsideClickArea.parent) {
+                outsideClickArea.width = windowRef.width
+            }
+        }
+        function onHeightChanged() {
+            if (windowRef && outsideClickArea.parent) {
+                outsideClickArea.height = windowRef.height
+            }
+        }
+    }
+
     // === 背景与阴影 ===
     MultiEffect {
         source: background
@@ -78,7 +147,15 @@ Item {
                       ? (root.passwordVisible ? TextInput.Normal : TextInput.Password)
                       : TextInput.Normal
             background: null
-            onAccepted: root.accepted()
+            onAccepted: {
+                root.accepted()
+                textField.focus = false
+            }
+            onActiveFocusChanged: {
+                if (!activeFocus) {
+                    root.accepted()
+                }
+            }
         }
 
         // === 密码显示切换按钮 ===
