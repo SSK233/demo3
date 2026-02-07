@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs
 import EvolveUI
 
 /**
@@ -383,6 +384,136 @@ Page {
     }
 
     /**
+     * @brief 电压输入区域
+     * 包含标签和输入框
+     */
+    Column {
+        id: voltageColumn
+        spacing: 8
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenterOffset: -178            //调整左右移动的位置，减号后面的数字增加则向左移动
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: -30
+
+        Text {
+            text: "输入电压/V"
+            color: theme.textColor
+            font.pixelSize: 14
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+
+        EInput {
+            id: voltageInput
+            placeholderText: ""
+            width: 120
+            height: 50
+            radius: 25
+            onTextChanged: {
+                var text = voltageInput.text
+                var filtered = ""
+                var dotFound = false
+                var decimalCount = 0
+                for (var i = 0; i < text.length; i++) {
+                    var ch = text.charAt(i)
+                    if (ch >= '0' && ch <= '9') {
+                        if (!dotFound || decimalCount < 1) {
+                            filtered += ch
+                            if (dotFound) decimalCount++
+                        }
+                    } else if (ch === '.' && !dotFound) {
+                        filtered += ch
+                        dotFound = true
+                    }
+                }
+                if (filtered !== text) {
+                    voltageInput.text = filtered
+                }
+                var voltageValue = parseFloat(filtered)
+                if (!isNaN(voltageValue)) {
+                    if (voltageValue > 1000) {
+                        voltageInput.text = "1000.0"
+                        voltageValue = 1000
+                    }
+                    var currentValue = parseFloat(currentInput.text)
+                    if (!isNaN(currentValue) && currentValue > 0) {
+                        var power = voltageValue * currentValue
+                        if (power > 30000) {
+                            var maxVoltage = Math.floor(30000 / currentValue * 10) / 10
+                            voltageInput.text = maxVoltage.toFixed(1)
+                            powerWarningDialog.open()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @brief 电流输入区域
+     * 包含标签和输入框
+     */
+    Column {
+        id: currentColumn
+        spacing: 8
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenterOffset: 20           //调整左右移动的位置，数字增加则向右移动
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: -30
+
+        Text {
+            text: "输入电流/A"
+            color: theme.textColor
+            font.pixelSize: 14
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+
+        EInput {
+            id: currentInput
+            placeholderText: ""
+            width: 120
+            height: 50
+            radius: 25
+            onTextChanged: {
+                var text = currentInput.text
+                var filtered = ""
+                var dotFound = false
+                var decimalCount = 0
+                for (var i = 0; i < text.length; i++) {
+                    var ch = text.charAt(i)
+                    if (ch >= '0' && ch <= '9') {
+                        if (!dotFound || decimalCount < 1) {
+                            filtered += ch
+                            if (dotFound) decimalCount++
+                        }
+                    } else if (ch === '.' && !dotFound) {
+                        filtered += ch
+                        dotFound = true
+                    }
+                }
+                if (filtered !== text) {
+                    currentInput.text = filtered
+                }
+                var currentValue = parseFloat(filtered)
+                if (!isNaN(currentValue)) {
+                    if (currentValue > 300) {
+                        currentInput.text = "300.0"
+                        currentValue = 300
+                    }
+                    var voltageValue = parseFloat(voltageInput.text)
+                    if (!isNaN(voltageValue) && voltageValue > 0) {
+                        var power = voltageValue * currentValue
+                        if (power > 30000) {
+                            var maxCurrent = Math.floor(30000 / voltageValue * 10) / 10
+                            currentInput.text = maxCurrent.toFixed(1)
+                            powerWarningDialog.open()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * @brief 载入按钮
      * 将滑块当前值应用到设备
      */
@@ -395,11 +526,12 @@ Page {
         textColor: theme.textColor
         iconColor: theme.textColor
         shadowEnabled: true
+        anchors.top: voltageColumn.bottom
+        anchors.topMargin: 20
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.horizontalCenterOffset: -60
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenterOffset: -140         //调整左右移动的位置，减号后面的数字增加则向左移动
         onClicked: {
-            console.log("载入电流值")
+            console.log("载入电压:", voltageInput.text, "V, 电流:", currentInput.text, "A")
         }
     }
 
@@ -416,12 +548,21 @@ Page {
         textColor: theme.textColor
         iconColor: theme.textColor
         shadowEnabled: true
+        anchors.top: voltageColumn.bottom
+        anchors.topMargin: 20
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.horizontalCenterOffset: 60
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenterOffset: -20            //调整左右移动的位置，减号后面的数字增加则向左移动
         onClicked: {
             console.log("卸载电流值")
         }
+    }
+
+    /** @brief 功率超限警告对话框 */
+    MessageDialog {
+        id: powerWarningDialog
+        title: "警告"
+        text: "输入的电压 × 电流不能超过 30000W（30KW），已自动调整数值。"
+        buttons: MessageDialog.Ok
     }
 
     /** @brief 动画窗口包装器 - 用于页面切换动画效果 */
