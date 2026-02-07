@@ -48,6 +48,13 @@ constexpr int WRITE_CURRENT_REGISTER_ADDRESS = 51;//寄存器地址51
 constexpr int FAN_SLAVE_ADDRESS = 1;//从站地址1
 constexpr int FAN_REGISTER_ADDRESS = 1;//寄存器地址1
 
+/**
+ * @brief 卸载控制相关常量定义
+ * @details 定义卸载控制的Modbus配置
+ */
+constexpr int UNLOAD_SLAVE_ADDRESS = 1;//从站地址1
+constexpr int UNLOAD_REGISTER_ADDRESS = 35;//寄存器地址35
+
 class ModbusManager : public QObject
 {
     Q_OBJECT
@@ -73,6 +80,7 @@ public:
     Q_INVOKABLE void writeCurrent(double value);
     Q_INVOKABLE void writeFanState(bool state);
     Q_INVOKABLE void writeVoltageAndCurrent(double voltage, double current);
+    Q_INVOKABLE void writeUnload();
     Q_INVOKABLE void writeHoldingRegister(int slaveAddress, int registerAddress, double value);
 
 signals:

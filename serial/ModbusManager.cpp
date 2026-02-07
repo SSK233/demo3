@@ -299,3 +299,47 @@ void ModbusManager::writeVoltageAndCurrent(double voltage, double current)
         qDebug() << "发送请求失败:" << m_modbusMaster->errorString();
     }
 }
+
+void ModbusManager::writeUnload()
+{
+    if (!m_modbusMaster || m_modbusMaster->state() != QModbusDevice::ConnectedState) {
+        qDebug() << "Modbus not connected, cannot write unload";
+        return;
+    }
+    
+    QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, UNLOAD_REGISTER_ADDRESS, 1);
+    writeUnit.setValue(0, 1);
+    
+    qDebug() << "========================================";
+    qDebug() << "发送卸载请求:";
+    qDebug() << "  从站地址:" << UNLOAD_SLAVE_ADDRESS;
+    qDebug() << "  寄存器地址:" << UNLOAD_REGISTER_ADDRESS;
+    qDebug() << "  写入值: 1";
+    qDebug() << "========================================";
+    
+    if (auto *reply = m_modbusMaster->sendWriteRequest(writeUnit, UNLOAD_SLAVE_ADDRESS)) {
+        if (!reply->isFinished()) {
+            connect(reply, &QModbusReply::finished, this, [this, reply]() {
+                qDebug() << "========================================";
+                qDebug() << "收到PLC响应(卸载):";
+                if (reply->error() == QModbusDevice::NoError) {
+                    const QModbusDataUnit result = reply->result();
+                    qDebug() << "  状态: 写入成功";
+                    qDebug() << "  从站地址:" << reply->serverAddress();
+                    qDebug() << "  寄存器地址:" << result.startAddress();
+                    qDebug() << "  写入值: 1";
+                } else {
+                    qDebug() << "  状态: 写入失败";
+                    qDebug() << "  错误码:" << static_cast<int>(reply->error());
+                    qDebug() << "  错误信息:" << reply->errorString();
+                }
+                qDebug() << "========================================";
+                reply->deleteLater();
+            });
+        } else {
+            delete reply;
+        }
+    } else {
+        qDebug() << "发送卸载请求失败:" << m_modbusMaster->errorString();
+    }
+}

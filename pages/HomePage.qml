@@ -564,7 +564,8 @@ Page {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: -20            //调整左右移动的位置，减号后面的数字增加则向左移动
         onClicked: {
-            console.log("卸载电流值")
+            modbusManager.writeUnload()
+            console.log("卸载: 从站1寄存器35写1")
         }
     }
 
