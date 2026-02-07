@@ -27,6 +27,27 @@ constexpr int CURRENT_REGISTER_ADDRESS = 1;//寄存器地址1
 constexpr int POWER_SLAVE_ADDRESS = 3;//从站地址3
 constexpr int POWER_REGISTER_ADDRESS = 3;//寄存器地址3
 
+/**
+ * @brief 电压写入相关常量定义
+ * @details 定义写入电压数据的Modbus配置
+ */
+constexpr int WRITE_VOLTAGE_SLAVE_ADDRESS = 1;//从站地址
+constexpr int WRITE_VOLTAGE_REGISTER_ADDRESS = 50;//寄存器地址
+
+/**
+ * @brief 电流写入相关常量定义
+ * @details 定义写入电流数据的Modbus配置
+ */
+constexpr int WRITE_CURRENT_SLAVE_ADDRESS = 1;//从站地址1
+constexpr int WRITE_CURRENT_REGISTER_ADDRESS = 51;//寄存器地址51
+
+/**
+ * @brief 风机控制相关常量定义
+ * @details 定义风机控制的Modbus配置
+ */
+constexpr int FAN_SLAVE_ADDRESS = 1;//从站地址1
+constexpr int FAN_REGISTER_ADDRESS = 1;//寄存器地址1
+
 class ModbusManager : public QObject
 {
     Q_OBJECT
@@ -48,6 +69,11 @@ public:
     Q_INVOKABLE void disconnectPort();
     Q_INVOKABLE void startReading(int intervalMs = 1000);
     Q_INVOKABLE void stopReading();
+    Q_INVOKABLE void writeVoltage(double value);
+    Q_INVOKABLE void writeCurrent(double value);
+    Q_INVOKABLE void writeFanState(bool state);
+    Q_INVOKABLE void writeVoltageAndCurrent(double voltage, double current);
+    Q_INVOKABLE void writeHoldingRegister(int slaveAddress, int registerAddress, double value);
 
 signals:
     void voltageChanged();

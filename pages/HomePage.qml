@@ -114,8 +114,9 @@ Page {
         anchors.topMargin: 16
         anchors.right: refreshSerialButton.left
         anchors.rightMargin: 24
-        onToggled: {
-            console.log("风机开关状态:", checked ? "开启" : "关闭")
+        onToggled: function(checked) {
+            modbusManager.writeFanState(checked)
+            console.log("风机开关状态:", checked ? "开启(1)" : "关闭(0)")
         }
     }
 
@@ -531,7 +532,17 @@ Page {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: -140         //调整左右移动的位置，减号后面的数字增加则向左移动
         onClicked: {
-            console.log("载入电压:", voltageInput.text, "V, 电流:", currentInput.text, "A")
+            voltageInput.focus = false
+            currentInput.focus = false
+            
+            var voltageValue = parseFloat(voltageInput.text)
+            var currentValue = parseFloat(currentInput.text)
+            if (!isNaN(voltageValue) && !isNaN(currentValue)) {
+                modbusManager.writeVoltageAndCurrent(voltageValue, currentValue)
+                console.log("载入: 电压 -> 寄存器50, 电流 -> 寄存器51 (单次发送)")
+            } else {
+                console.log("请输入有效的电压和电流值")
+            }
         }
     }
 

@@ -161,11 +161,14 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
+        preventStealing: true
+        z: 1000
 
         onPressed: {
             scale.xScale = root.pressedScale
             scale.yScale = root.pressedScale
             background.opacity = 0.85
+            root.clicked()
 
             if (root.iconRotateOnClick) {
                 rotateAnimation.start()
@@ -175,7 +178,6 @@ Rectangle {
         onReleased: {
             restoreAnimation.restart()
             background.opacity = 1.0
-            root.clicked()
 
             if (root.iconRotateOnClick) {
                 restoreRotation.start()

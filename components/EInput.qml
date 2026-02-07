@@ -33,13 +33,14 @@ Item {
         anchors.fill: parent
         propagateComposedEvents: true
         z: 999
-        onClicked: (mouse)=> {
+        onPressed: (mouse)=> {
             var pos = mapToItem(root, mouse.x, mouse.y)
             if (!root.contains(pos)) {
                 textField.focus = false
             }
             mouse.accepted = false
         }
+        preventStealing: true
     }
 
     property Window windowRef: null
