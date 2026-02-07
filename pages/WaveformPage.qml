@@ -62,6 +62,7 @@ Page {
 
                 EAreaChart {
                     id: voltageChart
+                    x: 5
                     width: parent.width - 10
                     height: 280
                     title: "电压波形"
@@ -76,6 +77,7 @@ Page {
 
                 EAreaChart {
                     id: currentChart
+                    x: 5
                     width: parent.width - 10
                     height: 280
                     title: "电流波形"
@@ -90,6 +92,7 @@ Page {
 
                 EAreaChart {
                     id: powerChart
+                    x: 5
                     width: parent.width - 10
                     height: 280
                     title: "功率波形"
