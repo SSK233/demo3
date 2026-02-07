@@ -192,7 +192,7 @@ Page {
             }
 
             Text {
-                text: !modbusManager.hasHighTempData ? "温度状态：未就绪" : (modbusManager.highTempState === 0 ? "温度状态：正常" : "温度状态：高温报警")
+                text: !modbusManager.hasHighTempData ? "温度状态： 未就绪" : (modbusManager.highTempState === 0 ? "温度状态：   正常" : "温度状态：高温报警")
                 color: theme.textColor
                 font.pixelSize: 12
                 Layout.fillWidth: true
