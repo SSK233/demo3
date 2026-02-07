@@ -96,6 +96,29 @@ Page {
     // ========================================================================
 
     /**
+     * @brief 风机开关
+     * 控制设备风机的运行状态
+     */
+    ESwitchButton {
+        id: fanSwitch
+        text: "风机开关"
+        size: "s"
+        containerColor: theme.secondaryColor
+        textColor: theme.textColor
+        thumbColor: "#FFFFFF"
+        trackUncheckedColor: theme.isDark ? "#555555" : "#CCCCCC"
+        trackCheckedColor: theme.isDark ? "#66BB6A" : "#4CAF50"
+        shadowEnabled: true
+        anchors.top: parent.top
+        anchors.topMargin: 16
+        anchors.right: refreshSerialButton.left
+        anchors.rightMargin: 24
+        onToggled: {
+            console.log("风机开关状态:", checked ? "开启" : "关闭")
+        }
+    }
+
+    /**
      * @brief 刷新串口按钮
      * 点击后刷新可用串口列表
      */
@@ -124,6 +147,7 @@ Page {
      */
     EDropdown {
         id: serialPortDropdown
+        z: 3
         title: "选择串口"                   // 默认提示文字
         width: 140                          // 宽度
         headerHeight: 40                    // 头部高度（与按钮一致）
@@ -142,6 +166,69 @@ Page {
     }
 
     /**
+     * @brief 波特率选择下拉框
+     * 显示常用波特率列表，供用户选择
+     */
+    EDropdown {
+        id: baudRateDropdown
+        z: 2
+        title: "波特率"
+        width: 140
+        headerHeight: 40
+        radius: 20
+        containerColor: theme.secondaryColor
+        textColor: theme.textColor
+        shadowEnabled: true
+        enabled: !serialPortSwitch.checked
+        anchors.top: serialPortDropdown.bottom
+        anchors.topMargin: 8
+        anchors.right: parent.right
+        anchors.rightMargin: 16
+        model: [
+            { text: "1200" },
+            { text: "2400" },
+            { text: "4800" },
+            { text: "9600" },
+            { text: "19200" },
+            { text: "38400" },
+            { text: "57600" },
+            { text: "115200" }
+        ]
+        Component.onCompleted: {
+            selectedIndex = 3
+        }
+    }
+
+    /**
+     * @brief 奇偶校验位选择下拉框
+     * 显示校验方式列表，供用户选择
+     */
+    EDropdown {
+        id: parityDropdown
+        z: 1
+        title: "校验位"
+        width: 140
+        headerHeight: 40
+        radius: 20
+        containerColor: theme.secondaryColor
+        textColor: theme.textColor
+        shadowEnabled: true
+        enabled: !serialPortSwitch.checked
+        anchors.top: baudRateDropdown.bottom
+        anchors.topMargin: 8
+        anchors.right: parent.right
+        anchors.rightMargin: 16
+        model: [
+            { text: "无校验" },
+            { text: "奇校验" },
+            { text: "偶校验" }
+        ]
+        Component.onCompleted: {
+            selectedIndex = 0
+        }
+    }
+
+    /**
      * @brief 串口开关
      * 控制串口的连接/断开状态
      */
@@ -156,7 +243,7 @@ Page {
         trackUncheckedColor: theme.isDark ? "#555555" : "#CCCCCC"  // 轨道未选中颜色
         trackCheckedColor: theme.isDark ? "#66BB6A" : "#4CAF50"    // 轨道选中颜色（绿色）
         shadowEnabled: true                 // 启用阴影效果
-        anchors.top: serialPortDropdown.bottom
+        anchors.top: parityDropdown.bottom
         anchors.topMargin: 8
         anchors.right: parent.right
         anchors.rightMargin: 16
@@ -164,7 +251,9 @@ Page {
             if (checked) {
                 if (selectedSerialPortIndex >= 0 && serialPortDropdown.model[selectedSerialPortIndex]) {
                     var portName = serialPortDropdown.model[selectedSerialPortIndex].text
-                    var success = modbusManager.connectToPort(portName)
+                    var baudRate = parseInt(baudRateDropdown.model[baudRateDropdown.selectedIndex].text)
+                    var parity = parityDropdown.selectedIndex
+                    var success = modbusManager.connectToPort(portName, baudRate, parity)
                     if (success) {
                         modbusManager.startReading(1000)
                     } else {
@@ -180,29 +269,7 @@ Page {
         }
     }
 
-    /**
-     * @brief 风机开关
-     * 控制设备风机的运行状态
-     */
-    ESwitchButton {
-        id: fanSwitch
-        z: -1   
-        text: "风机开关"
-        size: "s"                          // 小号尺寸
-        containerColor: theme.secondaryColor // 背景颜色
-        textColor: theme.textColor          // 文字颜色
-        thumbColor: "#FFFFFF"               // 滑块颜色（白色）
-        trackUncheckedColor: theme.isDark ? "#555555" : "#CCCCCC"  // 轨道未选中颜色
-        trackCheckedColor: theme.isDark ? "#66BB6A" : "#4CAF50"    // 轨道选中颜色（绿色）
-        shadowEnabled: true                 // 启用阴影效果
-        anchors.top: serialPortSwitch.bottom
-        anchors.topMargin: 8
-        anchors.right: parent.right
-        anchors.rightMargin: 16
-        onToggled: {
-            console.log("风机开关状态:", checked ? "开启" : "关闭")
-        }
-    }
+
 
     // ========================================================================
     // 电气参数显示区域

@@ -44,7 +44,7 @@ public:
     double power() const { return m_power; }
     bool connected() const { return m_connected; }
 
-    Q_INVOKABLE bool connectToPort(const QString &portName, int baudRate = 9600);
+    Q_INVOKABLE bool connectToPort(const QString &portName, int baudRate = 9600, int parity = 0);
     Q_INVOKABLE void disconnectPort();
     Q_INVOKABLE void startReading(int intervalMs = 1000);
     Q_INVOKABLE void stopReading();

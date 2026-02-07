@@ -32,23 +32,38 @@ ModbusManager::~ModbusManager()
     }
 }
 
-bool ModbusManager::connectToPort(const QString &portName, int baudRate)
+bool ModbusManager::connectToPort(const QString &portName, int baudRate, int parity)
 {
     if (m_connected) {
         disconnectPort();
     }
     
+    QSerialPort::Parity parityValue = QSerialPort::NoParity;
+    if (parity == 1) {
+        parityValue = QSerialPort::OddParity;
+    } else if (parity == 2) {
+        parityValue = QSerialPort::EvenParity;
+    }
+    
     m_modbusMaster->setConnectionParameter(QModbusDevice::SerialPortNameParameter, QVariant::fromValue(portName));
     m_modbusMaster->setConnectionParameter(QModbusDevice::SerialBaudRateParameter, QVariant::fromValue(baudRate));
     m_modbusMaster->setConnectionParameter(QModbusDevice::SerialDataBitsParameter, QVariant::fromValue(QSerialPort::Data8));
-    m_modbusMaster->setConnectionParameter(QModbusDevice::SerialParityParameter, QVariant::fromValue(QSerialPort::NoParity));
+    m_modbusMaster->setConnectionParameter(QModbusDevice::SerialParityParameter, QVariant::fromValue(parityValue));
     m_modbusMaster->setConnectionParameter(QModbusDevice::SerialStopBitsParameter, QVariant::fromValue(QSerialPort::OneStop));
     
     m_modbusMaster->setTimeout(1000);
     m_modbusMaster->setNumberOfRetries(3);
     
     m_modbusMaster->connectDevice();
-    qDebug() << "Modbus connecting to port:" << portName;
+    QString parityStr = (parity == 0) ? "无校验" : (parity == 1) ? "奇校验" : "偶校验";
+    qDebug() << "========================================";
+    qDebug() << "Modbus 连接参数:";
+    qDebug() << "  串口号:" << portName;
+    qDebug() << "  波特率:" << baudRate;
+    qDebug() << "  校验位:" << parityStr;
+    qDebug() << "  数据位: 8";
+    qDebug() << "  停止位: 1";
+    qDebug() << "========================================";
     return true;
 }
 
