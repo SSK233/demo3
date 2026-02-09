@@ -427,7 +427,8 @@ Rectangle {
                     
                     drawLinePath(ctx, points, root.lineStyle);
                     
-                    ctx.strokeStyle = seriesColor;
+                    var lineColorObj = Qt.color(seriesColor);
+                    ctx.strokeStyle = Qt.rgba(lineColorObj.r, lineColorObj.g, lineColorObj.b, 1.0);
                     ctx.lineWidth = 2;
                     ctx.stroke();
 
@@ -438,7 +439,8 @@ Rectangle {
                         // 绘制外圆
                         ctx.beginPath();
                         ctx.arc(hoveredPoint.x, hoveredPoint.y, 5, 0, 2 * Math.PI);
-                        ctx.fillStyle = seriesColor;
+                        var dotColorObj = Qt.color(seriesColor);
+                        ctx.fillStyle = Qt.rgba(dotColorObj.r, dotColorObj.g, dotColorObj.b, 1.0);
                         ctx.fill();
                         
                         // 绘制内圆

@@ -4,6 +4,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 import QtCore
+import Qt.labs.platform as LabsPlatform
 import EvolveUI
 
 // 波形显示页面组件
@@ -18,7 +19,7 @@ Page {
         id: dataRecorder
         interval: 3
 
-        onExportFinished: {
+        onExportFinished: function(success, filePath) {
             if (success) {
                 exportSuccessDialog.message = "数据报表已成功导出到：\n" + filePath
                 exportSuccessDialog.open()
@@ -29,15 +30,22 @@ Page {
         }
     }
 
-    // 导出报表对话框
-    EAlertDialog {
-        id: exportDialog
+    // 文件保存对话框
+    LabsPlatform.FileDialog {
+        id: fileDialog
         title: "导出报表"
-        message: "数据报表将保存到桌面，文件名格式为：数据报表_时间戳.csv"
-        confirmText: "导出"
-        cancelText: "取消"
-        onConfirm: {
-            dataRecorder.exportToExcel("")
+        fileMode: LabsPlatform.FileDialog.SaveFile
+        defaultSuffix: "csv"
+        nameFilters: ["CSV文件 (*.csv)", "所有文件 (*)"]
+        onAccepted: {
+            var filePath = fileDialog.file.toString()
+            if (filePath.startsWith("file:///")) {
+                filePath = filePath.substring(8)
+            }
+            if (!filePath.endsWith(".csv")) {
+                filePath += ".csv"
+            }
+            dataRecorder.exportToExcel(filePath)
         }
     }
 
@@ -48,6 +56,30 @@ Page {
         message: ""
         confirmText: "确定"
         cancelText: ""
+    }
+
+    // 清除波形图确认对话框
+    EAlertDialog {
+        id: clearWaveformDialog
+        title: "确认清除波形"
+        message: "确定要清除波形图数据吗？"
+        confirmText: "确定"
+        cancelText: "取消"
+        onConfirm: {
+            waveformDataManager.clearData()
+        }
+    }
+
+    // 清除报表数据确认对话框
+    EAlertDialog {
+        id: clearRecordDialog
+        title: "确认清除报表"
+        message: "确定要清除已记录的报表数据吗？"
+        confirmText: "确定"
+        cancelText: "取消"
+        onConfirm: {
+            dataRecorder.clearData()
+        }
     }
 
     // 实时更新数据 - 从波形数据管理器获取最新值
@@ -155,22 +187,37 @@ Page {
                         iconColor: theme.textColor
                         shadowEnabled: true
                         onClicked: {
-                            exportDialog.open()
+                            fileDialog.open()
                         }
                     }
 
-                    // 清除数据按钮
+                    // 清除波形图按钮
                     EButton {
-                        id: clearButton
-                        text: "清除数据"
-                        iconCharacter: "\uf1f8"  // 垃圾桶图标
-                        size: "s"  // 按钮大小
-                        containerColor: theme.secondaryColor  // 容器颜色
-                        textColor: theme.textColor  // 文本颜色
-                        iconColor: theme.textColor  // 图标颜色
-                        shadowEnabled: true  // 启用阴影
+                        id: clearWaveformButton
+                        text: "清除波形"
+                        iconCharacter: "\uf1f8"
+                        size: "s"
+                        containerColor: theme.secondaryColor
+                        textColor: theme.textColor
+                        iconColor: theme.textColor
+                        shadowEnabled: true
                         onClicked: {
-                            waveformDataManager.clearData()  // 调用数据管理器的清除数据方法
+                            clearWaveformDialog.open()
+                        }
+                    }
+
+                    // 清除报表数据按钮
+                    EButton {
+                        id: clearRecordButton
+                        text: "清除报表"
+                        iconCharacter: "\uf1f8"
+                        size: "s"
+                        containerColor: theme.secondaryColor
+                        textColor: theme.textColor
+                        iconColor: theme.textColor
+                        shadowEnabled: true
+                        onClicked: {
+                            clearRecordDialog.open()
                         }
                     }
 
