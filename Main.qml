@@ -12,8 +12,11 @@ import EvolveUI
 
 // 主应用程序窗口 - 作为整个应用的根容器，包含所有UI元素
 ApplicationWindow {
-    // 窗口初始宽度：960像素
-    width: 960
+    // 窗口初始宽度：1260像素
+    width: 1260
+
+    // 窗口最小宽度：1260像素
+    minimumWidth: 1260
     
     // 窗口初始高度：540像素（16:9标准宽高比）
     height: 540
