@@ -11,6 +11,8 @@ qt_add_executable(demo3
     serial/SerialPortManager.cpp
     serial/ModbusManager.h
     serial/ModbusManager.cpp
+    serial/DataRecorder.h
+    serial/DataRecorder.cpp
 )
 file(GLOB_RECURSE QML_COMPONENTS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS "components/*.qml")
 qt_add_qml_module(demo3

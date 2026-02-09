@@ -2,6 +2,8 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs
+import QtCore
 import EvolveUI
 
 // 波形显示页面组件
@@ -10,6 +12,65 @@ Page {
 
     // 动画窗口属性别名，用于外部访问
     property alias animatedWindow: animationWrapper
+
+    // 数据记录器
+    DataRecorder {
+        id: dataRecorder
+        interval: 3
+
+        onExportFinished: {
+            if (success) {
+                exportSuccessDialog.message = "数据报表已成功导出到：\n" + filePath
+                exportSuccessDialog.open()
+            } else {
+                exportSuccessDialog.message = "导出失败，请检查文件路径是否被占用"
+                exportSuccessDialog.open()
+            }
+        }
+    }
+
+    // 导出报表对话框
+    EAlertDialog {
+        id: exportDialog
+        title: "导出报表"
+        message: "数据报表将保存到桌面，文件名格式为：数据报表_时间戳.csv"
+        confirmText: "导出"
+        cancelText: "取消"
+        onConfirm: {
+            dataRecorder.exportToExcel("")
+        }
+    }
+
+    // 导出成功对话框
+    EAlertDialog {
+        id: exportSuccessDialog
+        title: "提示"
+        message: ""
+        confirmText: "确定"
+        cancelText: ""
+    }
+
+    // 实时更新数据 - 从波形数据管理器获取最新值
+    Timer {
+        interval: 100
+        running: true
+        repeat: true
+        onTriggered: {
+            var voltage = 0
+            var current = 0
+            var power = 0
+            if (waveformDataManager.voltageHistory && waveformDataManager.voltageHistory.length > 0) {
+                voltage = waveformDataManager.voltageHistory[waveformDataManager.voltageHistory.length - 1]
+            }
+            if (waveformDataManager.currentHistory && waveformDataManager.currentHistory.length > 0) {
+                current = waveformDataManager.currentHistory[waveformDataManager.currentHistory.length - 1]
+            }
+            if (waveformDataManager.powerHistory && waveformDataManager.powerHistory.length > 0) {
+                power = waveformDataManager.powerHistory[waveformDataManager.powerHistory.length - 1]
+            }
+            dataRecorder.addData(voltage, current, power)
+        }
+    }
 
     // 页面背景设置为透明
     background: Rectangle {
@@ -51,6 +112,53 @@ Page {
                         height: 10
                     }
 
+                    // 开始记录按钮
+                    EButton {
+                        id: startRecordButton
+                        text: dataRecorder.recording ? "记录中..." : "开始记录"
+                        iconCharacter: dataRecorder.recording ? "\uf111" : "\uf04b"
+                        size: "s"
+                        containerColor: dataRecorder.recording ? "#ef4444" : theme.secondaryColor
+                        textColor: theme.textColor
+                        iconColor: theme.textColor
+                        shadowEnabled: true
+                        onClicked: {
+                            if (!dataRecorder.recording) {
+                                dataRecorder.startRecording()
+                            }
+                        }
+                    }
+
+                    // 停止记录按钮
+                    EButton {
+                        id: stopRecordButton
+                        text: "停止记录"
+                        iconCharacter: "\uf04d"
+                        size: "s"
+                        containerColor: theme.secondaryColor
+                        textColor: theme.textColor
+                        iconColor: theme.textColor
+                        shadowEnabled: true
+                        onClicked: {
+                            dataRecorder.stopRecording()
+                        }
+                    }
+
+                    // 导出报表按钮
+                    EButton {
+                        id: exportButton
+                        text: "导出报表"
+                        iconCharacter: "\uf1c3"
+                        size: "s"
+                        containerColor: theme.secondaryColor
+                        textColor: theme.textColor
+                        iconColor: theme.textColor
+                        shadowEnabled: true
+                        onClicked: {
+                            exportDialog.open()
+                        }
+                    }
+
                     // 清除数据按钮
                     EButton {
                         id: clearButton
@@ -66,9 +174,37 @@ Page {
                         }
                     }
 
-                    // 右侧填充空白，使按钮靠左对齐
-                    Item {
+                    // 记录状态显示
+                    Rectangle {
                         Layout.fillWidth: true
+                        Layout.preferredHeight: 40
+                        color: "transparent"
+
+                        RowLayout {
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 8
+
+                            Rectangle {
+                                width: 12
+                                height: 12
+                                radius: 6
+                                color: dataRecorder.recording ? "#22c55e" : "#9ca3af"
+                            }
+
+                            Text {
+                                text: dataRecorder.recording ? "正在记录" : "已停止"
+                                color: dataRecorder.recording ? "#22c55e" : "#9ca3af"
+                                font.pixelSize: 12
+                                font.bold: true
+                            }
+
+                            Text {
+                                text: "| 已记录: " + dataRecorder.recordCount + " 条"
+                                color: theme.textColor
+                                font.pixelSize: 12
+                            }
+                        }
                     }
                 }
 
