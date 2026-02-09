@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
-    app.setWindowIcon(QIcon(":/new/prefix1/fonts/icon.ico"));
+    app.setWindowIcon(QIcon(":/new/prefix1/fonts/app.ico"));
 
     qmlRegisterType<SerialPortManager>("EvolveUI", 1, 0, "SerialPortManager");
     qmlRegisterType<ModbusManager>("EvolveUI", 1, 0, "ModbusManager");
