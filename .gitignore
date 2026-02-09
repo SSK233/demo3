@@ -11,6 +11,7 @@ qrc_*.cpp
 ui_*.h
 *.o
 *.exe
+!demo3setup.exe
 *.dll
 *.so
 *.dylib
