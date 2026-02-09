@@ -5,6 +5,11 @@ find_package(Qt6 REQUIRED COMPONENTS Quick Multimedia Network SerialPort SerialB
 
 qt_standard_project_setup(REQUIRES 6.8)
 
+if(MINGW)
+    set(CMAKE_RC_COMPILER windres)
+    set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} --use-temp-file")
+endif()
+
 qt_add_executable(demo3
     main.cpp
     serial/SerialPortManager.h
@@ -13,6 +18,7 @@ qt_add_executable(demo3
     serial/ModbusManager.cpp
     serial/DataRecorder.h
     serial/DataRecorder.cpp
+    app.rc
 )
 file(GLOB_RECURSE QML_COMPONENTS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS "components/*.qml")
 qt_add_qml_module(demo3
