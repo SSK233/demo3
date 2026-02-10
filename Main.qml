@@ -58,8 +58,8 @@ ApplicationWindow {
         Pane {
             id: sidebar  // 侧边栏的唯一标识符
             
-            // 侧边栏展开状态 - 默认为折叠
-            property bool expanded: false
+            // 侧边栏展开状态 - 默认为展开
+            property bool expanded: true
             
             // 侧边栏折叠时的宽度
             property int collapsedWidth: 85
@@ -98,11 +98,7 @@ ApplicationWindow {
                 }
             }
 
-            // 悬停处理器 - 监听鼠标悬停事件以控制侧边栏展开/折叠
-            HoverHandler {
-                // 当悬停状态改变时，更新侧边栏的展开状态
-                onHoveredChanged: sidebar.expanded = hovered
-            }
+            // 悬停处理器已移除 - 侧边栏保持固定展开状态
 
             // 导航列表模型 - 定义导航菜单项数据
             ListModel {

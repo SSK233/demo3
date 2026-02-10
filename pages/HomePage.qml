@@ -202,6 +202,19 @@ Page {
     }
 
     /**
+     * @brief 数字时钟卡片
+     * 使用网络天气，图标随天气自动切换
+     */
+    EClockCard {
+        useNetworkWeather: true
+        weatherApiKey: "SLKpiXphkV7ch3vZp"
+        weatherLocation: "ip"
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.margins: 16
+    }
+
+    /**
      * @brief 刷新串口按钮
      * 点击后刷新可用串口列表
      */
@@ -215,9 +228,10 @@ Page {
         textColor: theme.textColor         // 文字颜色（自适应深色模式）
         iconColor: theme.textColor         // 图标颜色（自适应深色模式）
         shadowEnabled: true                // 启用阴影效果
-        anchors.top: parent.top
+        anchors.top: timeCard.bottom
+        anchors.topMargin: 16
         anchors.right: parent.right
-        anchors.margins: 16                // 与边缘之间的间距
+        anchors.rightMargin: 16
         onClicked: {
             serialPortManager.refreshPorts()
         }
@@ -359,108 +373,215 @@ Page {
     // ========================================================================
 
     /**
-     * @brief 电气参数卡片
-     * 显示电压、电流、功率三个电气参数
+     * @brief 三相电气参数卡片
+     * 显示A、B、C三相的电压、电流、功率
      */
     EHoverCard {
         id: electricCard
-        z: -1   
-        width: 120                              // 卡片宽度
-        height: 250                             // 卡片高度
+        z: -1
+        width: 360                              // 卡片宽度
+        height: 180                             // 卡片高度
         anchors.bottom: parent.bottom           // 底部对齐
         anchors.bottomMargin: 16                // 底部边距
         anchors.right: parent.right             // 右侧对齐
         anchors.rightMargin: 16                 // 右边距
 
-        // === 内容布局：垂直排列三个参数 ===
-        ColumnLayout {
+        // === 内容布局：网格排列三相数据 ===
+        GridLayout {
             anchors.fill: parent
-            anchors.margins: 16
-            spacing: 12
+            anchors.margins: 12
+            columns: 6
+            rowSpacing: 8
+            columnSpacing: 8
 
-            /** 电压显示区域 */
-            ColumnLayout {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                spacing: 4
-
-                Text {
-                    text: "电压"
-                    color: theme.textColor
-                    font.pixelSize: 14
-                    horizontalAlignment: Text.AlignHCenter
-                    Layout.fillWidth: true
-                }
-                Text {
-                    text: modbusManager.voltage.toFixed(1) + " V"
-                    color: theme.textColor
-                    font.pixelSize: 16
-                    font.bold: true
-                    horizontalAlignment: Text.AlignHCenter
-                    Layout.fillWidth: true
-                }
+            Text {
+                text: ""
+                Layout.preferredWidth: 40
             }
 
-            /** 分隔线 */
+            Text {
+                text: "A相"
+                color: theme.textColor
+                font.pixelSize: 12
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                Layout.preferredWidth: 80
+            }
+
             Rectangle {
-                Layout.fillWidth: true
-                height: 1
+                Layout.preferredWidth: 1
+                Layout.fillHeight: true
                 color: theme.textColor
                 opacity: 0.3
             }
 
-            /** 电流显示区域 */
-            ColumnLayout {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                spacing: 4
-
-                Text {
-                    text: "电流"
-                    color: theme.textColor
-                    font.pixelSize: 14
-                    horizontalAlignment: Text.AlignHCenter
-                    Layout.fillWidth: true
-                }
-                Text {
-                    text: modbusManager.current.toFixed(1) + " A"
-                    color: theme.textColor
-                    font.pixelSize: 16
-                    font.bold: true
-                    horizontalAlignment: Text.AlignHCenter
-                    Layout.fillWidth: true
-                }
+            Text {
+                text: "B相"
+                color: theme.textColor
+                font.pixelSize: 12
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                Layout.preferredWidth: 80
             }
 
-            /** 分隔线 */
             Rectangle {
-                Layout.fillWidth: true
-                height: 1
+                Layout.preferredWidth: 1
+                Layout.fillHeight: true
                 color: theme.textColor
                 opacity: 0.3
             }
 
-            /** 功率显示区域 */
-            ColumnLayout {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                spacing: 4
+            Text {
+                text: "C相"
+                color: theme.textColor
+                font.pixelSize: 12
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                Layout.preferredWidth: 80
+            }
 
-                Text {
-                    text: "功率"
-                    color: theme.textColor
-                    font.pixelSize: 14
-                    horizontalAlignment: Text.AlignHCenter
-                    Layout.fillWidth: true
-                }
-                Text {
-                    text: modbusManager.power.toFixed(2) + " kW"
-                    color: theme.textColor
-                    font.pixelSize: 16
-                    font.bold: true
-                    horizontalAlignment: Text.AlignHCenter
-                    Layout.fillWidth: true
-                }
+            Text {
+                text: "电压"
+                color: theme.textColor
+                font.pixelSize: 12
+                Layout.preferredWidth: 40
+            }
+
+            Text {
+                text: "220.0 V"
+                color: theme.textColor
+                font.pixelSize: 12
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                Layout.preferredWidth: 80
+            }
+
+            Rectangle {
+                Layout.preferredWidth: 1
+                Layout.fillHeight: true
+                color: theme.textColor
+                opacity: 0.3
+            }
+
+            Text {
+                text: "221.5 V"
+                color: theme.textColor
+                font.pixelSize: 12
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                Layout.preferredWidth: 80
+            }
+
+            Rectangle {
+                Layout.preferredWidth: 1
+                Layout.fillHeight: true
+                color: theme.textColor
+                opacity: 0.3
+            }
+
+            Text {
+                text: "219.8 V"
+                color: theme.textColor
+                font.pixelSize: 12
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                Layout.preferredWidth: 80
+            }
+
+            Text {
+                text: "电流"
+                color: theme.textColor
+                font.pixelSize: 12
+                Layout.preferredWidth: 40
+            }
+
+            Text {
+                text: "10.5 A"
+                color: theme.textColor
+                font.pixelSize: 12
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                Layout.preferredWidth: 80
+            }
+
+            Rectangle {
+                Layout.preferredWidth: 1
+                Layout.fillHeight: true
+                color: theme.textColor
+                opacity: 0.3
+            }
+
+            Text {
+                text: "10.2 A"
+                color: theme.textColor
+                font.pixelSize: 12
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                Layout.preferredWidth: 80
+            }
+
+            Rectangle {
+                Layout.preferredWidth: 1
+                Layout.fillHeight: true
+                color: theme.textColor
+                opacity: 0.3
+            }
+
+            Text {
+                text: "10.8 A"
+                color: theme.textColor
+                font.pixelSize: 12
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                Layout.preferredWidth: 80
+            }
+
+            Text {
+                text: "功率"
+                color: theme.textColor
+                font.pixelSize: 12
+                Layout.preferredWidth: 40
+            }
+
+            Text {
+                text: "2.31 kW"
+                color: theme.textColor
+                font.pixelSize: 12
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                Layout.preferredWidth: 80
+            }
+
+            Rectangle {
+                Layout.preferredWidth: 1
+                Layout.fillHeight: true
+                color: theme.textColor
+                opacity: 0.3
+            }
+
+            Text {
+                text: "2.26 kW"
+                color: theme.textColor
+                font.pixelSize: 12
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                Layout.preferredWidth: 80
+            }
+
+            Rectangle {
+                Layout.preferredWidth: 1
+                Layout.fillHeight: true
+                color: theme.textColor
+                opacity: 0.3
+            }
+
+            Text {
+                text: "2.37 kW"
+                color: theme.textColor
+                font.pixelSize: 12
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                Layout.preferredWidth: 80
             }
         }
     }
