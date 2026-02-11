@@ -111,10 +111,10 @@ Page {
         trackUncheckedColor: theme.isDark ? "#555555" : "#CCCCCC"
         trackCheckedColor: theme.isDark ? "#66BB6A" : "#4CAF50"
         shadowEnabled: true
-        anchors.top: parent.top
+        anchors.top: serialPortSwitch.bottom
         anchors.topMargin: 16
-        anchors.right: refreshSerialButton.left
-        anchors.rightMargin: 24
+        anchors.right: parent.right
+        anchors.rightMargin: 16
         onToggled: function(checked) {
             modbusManager.writeFanState(checked)
             console.log("风机开关状态:", checked ? "开启(1)" : "关闭(0)")
@@ -228,8 +228,8 @@ Page {
         textColor: theme.textColor         // 文字颜色（自适应深色模式）
         iconColor: theme.textColor         // 图标颜色（自适应深色模式）
         shadowEnabled: true                // 启用阴影效果
-        anchors.top: timeCard.bottom
-        anchors.topMargin: 16
+        anchors.top: parent.top
+        anchors.topMargin: 20
         anchors.right: parent.right
         anchors.rightMargin: 16
         onClicked: {
