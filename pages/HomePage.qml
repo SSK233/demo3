@@ -379,12 +379,9 @@ Page {
     EHoverCard {
         id: electricCard
         z: -1
-        width: 360                              // 卡片宽度
-        height: 180                             // 卡片高度
-        anchors.bottom: parent.bottom           // 底部对齐
-        anchors.bottomMargin: 16                // 底部边距
-        anchors.right: parent.right             // 右侧对齐
-        anchors.rightMargin: 16                 // 右边距
+        width: 420                              // 卡片宽度
+        height: 220                             // 卡片高度
+        anchors.centerIn: parent                // 居中对齐
 
         // === 内容布局：网格排列三相数据 ===
         GridLayout {
@@ -587,128 +584,124 @@ Page {
     }
 
     /**
-     * @brief 电压输入区域
-     * 包含标签和输入框
+     * @brief 电压电流输入区域
+     * 包含电压和电流输入框，上下排列
      */
     Column {
-        id: voltageColumn
-        spacing: 8
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.horizontalCenterOffset: -178            //调整左右移动的位置，减号后面的数字增加则向左移动
+        id: inputColumn
+        spacing: 16
+        anchors.left: parent.left
+        anchors.leftMargin: 16
         anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: -30
 
-        Text {
-            text: "输入电压/V"
-            color: theme.textColor
-            font.pixelSize: 14
+        Column {
+            spacing: 8
             anchors.horizontalCenter: parent.horizontalCenter
-        }
 
-        EInput {
-            id: voltageInput
-            placeholderText: ""
-            width: 120
-            height: 50
-            radius: 25
-            onTextChanged: {
-                var text = voltageInput.text
-                var filtered = ""
-                var dotFound = false
-                var decimalCount = 0
-                for (var i = 0; i < text.length; i++) {
-                    var ch = text.charAt(i)
-                    if (ch >= '0' && ch <= '9') {
-                        if (!dotFound || decimalCount < 1) {
+            Text {
+                text: "输入电压/V"
+                color: theme.textColor
+                font.pixelSize: 14
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            EInput {
+                id: voltageInput
+                placeholderText: ""
+                width: 120
+                height: 50
+                radius: 25
+                onTextChanged: {
+                    var text = voltageInput.text
+                    var filtered = ""
+                    var dotFound = false
+                    var decimalCount = 0
+                    for (var i = 0; i < text.length; i++) {
+                        var ch = text.charAt(i)
+                        if (ch >= '0' && ch <= '9') {
+                            if (!dotFound || decimalCount < 1) {
+                                filtered += ch
+                                if (dotFound) decimalCount++
+                            }
+                        } else if (ch === '.' && !dotFound) {
                             filtered += ch
-                            if (dotFound) decimalCount++
+                            dotFound = true
                         }
-                    } else if (ch === '.' && !dotFound) {
-                        filtered += ch
-                        dotFound = true
                     }
-                }
-                if (filtered !== text) {
-                    voltageInput.text = filtered
-                }
-                var voltageValue = parseFloat(filtered)
-                if (!isNaN(voltageValue)) {
-                    if (voltageValue > 1000) {
-                        voltageInput.text = "1000.0"
-                        voltageValue = 1000
+                    if (filtered !== text) {
+                        voltageInput.text = filtered
                     }
-                    var currentValue = parseFloat(currentInput.text)
-                    if (!isNaN(currentValue) && currentValue > 0) {
-                        var power = voltageValue * currentValue
-                        if (power > 30000) {
-                            var maxVoltage = Math.floor(30000 / currentValue * 10) / 10
-                            voltageInput.text = maxVoltage.toFixed(1)
-                            powerWarningDialog.open()
+                    var voltageValue = parseFloat(filtered)
+                    if (!isNaN(voltageValue)) {
+                        if (voltageValue > 1000) {
+                            voltageInput.text = "1000.0"
+                            voltageValue = 1000
+                        }
+                        var currentValue = parseFloat(currentInput.text)
+                        if (!isNaN(currentValue) && currentValue > 0) {
+                            var power = voltageValue * currentValue
+                            if (power > 30000) {
+                                var maxVoltage = Math.floor(30000 / currentValue * 10) / 10
+                                voltageInput.text = maxVoltage.toFixed(1)
+                                powerWarningDialog.open()
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
-    /**
-     * @brief 电流输入区域
-     * 包含标签和输入框
-     */
-    Column {
-        id: currentColumn
-        spacing: 8
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.horizontalCenterOffset: 20           //调整左右移动的位置，数字增加则向右移动
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: -30
-
-        Text {
-            text: "输入电流/A"
-            color: theme.textColor
-            font.pixelSize: 14
+        Column {
+            spacing: 8
             anchors.horizontalCenter: parent.horizontalCenter
-        }
 
-        EInput {
-            id: currentInput
-            placeholderText: ""
-            width: 120
-            height: 50
-            radius: 25
-            onTextChanged: {
-                var text = currentInput.text
-                var filtered = ""
-                var dotFound = false
-                var decimalCount = 0
-                for (var i = 0; i < text.length; i++) {
-                    var ch = text.charAt(i)
-                    if (ch >= '0' && ch <= '9') {
-                        if (!dotFound || decimalCount < 1) {
+            Text {
+                text: "输入电流/A"
+                color: theme.textColor
+                font.pixelSize: 14
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            EInput {
+                id: currentInput
+                placeholderText: ""
+                width: 120
+                height: 50
+                radius: 25
+                onTextChanged: {
+                    var text = currentInput.text
+                    var filtered = ""
+                    var dotFound = false
+                    var decimalCount = 0
+                    for (var i = 0; i < text.length; i++) {
+                        var ch = text.charAt(i)
+                        if (ch >= '0' && ch <= '9') {
+                            if (!dotFound || decimalCount < 1) {
+                                filtered += ch
+                                if (dotFound) decimalCount++
+                            }
+                        } else if (ch === '.' && !dotFound) {
                             filtered += ch
-                            if (dotFound) decimalCount++
+                            dotFound = true
                         }
-                    } else if (ch === '.' && !dotFound) {
-                        filtered += ch
-                        dotFound = true
                     }
-                }
-                if (filtered !== text) {
-                    currentInput.text = filtered
-                }
-                var currentValue = parseFloat(filtered)
-                if (!isNaN(currentValue)) {
-                    if (currentValue > 300) {
-                        currentInput.text = "300.0"
-                        currentValue = 300
+                    if (filtered !== text) {
+                        currentInput.text = filtered
                     }
-                    var voltageValue = parseFloat(voltageInput.text)
-                    if (!isNaN(voltageValue) && voltageValue > 0) {
-                        var power = voltageValue * currentValue
-                        if (power > 30000) {
-                            var maxCurrent = Math.floor(30000 / voltageValue * 10) / 10
-                            currentInput.text = maxCurrent.toFixed(1)
-                            powerWarningDialog.open()
+                    var currentValue = parseFloat(filtered)
+                    if (!isNaN(currentValue)) {
+                        if (currentValue > 300) {
+                            currentInput.text = "300.0"
+                            currentValue = 300
+                        }
+                        var voltageValue = parseFloat(voltageInput.text)
+                        if (!isNaN(voltageValue) && voltageValue > 0) {
+                            var power = voltageValue * currentValue
+                            if (power > 30000) {
+                                var maxCurrent = Math.floor(30000 / voltageValue * 10) / 10
+                                currentInput.text = maxCurrent.toFixed(1)
+                                powerWarningDialog.open()
+                            }
                         }
                     }
                 }
@@ -729,14 +722,14 @@ Page {
         textColor: theme.textColor
         iconColor: theme.textColor
         shadowEnabled: true
-        anchors.top: voltageColumn.bottom
-        anchors.topMargin: 20
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.horizontalCenterOffset: -140         //调整左右移动的位置，减号后面的数字增加则向左移动
+        anchors.bottom: unloadButton.top
+        anchors.bottomMargin: 16
+        anchors.left: parent.left
+        anchors.leftMargin: 16
         onClicked: {
             voltageInput.focus = false
             currentInput.focus = false
-            
+
             var voltageValue = parseFloat(voltageInput.text)
             var currentValue = parseFloat(currentInput.text)
             if (!isNaN(voltageValue) && !isNaN(currentValue)) {
@@ -776,10 +769,10 @@ Page {
         textColor: theme.textColor
         iconColor: theme.textColor
         shadowEnabled: true
-        anchors.top: voltageColumn.bottom
-        anchors.topMargin: 20
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.horizontalCenterOffset: -20            //调整左右移动的位置，减号后面的数字增加则向左移动
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 16
+        anchors.left: parent.left
+        anchors.leftMargin: 16
         onClicked: {
             unloadConfirmDialog.open()
         }
