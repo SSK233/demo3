@@ -212,6 +212,8 @@ Page {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.margins: 16
+        width: 200
+        height: 70
     }
 
     /**

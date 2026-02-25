@@ -15,6 +15,9 @@ Item {
     property bool backgroundVisible: true
     property bool shadowEnabled: true
     property color shadowColor: theme.shadowColor
+    property real timeFontSize: 54
+    property real dateFontSize: 12
+    property real iconFontSize: 16
 
     // === 时间与显示 ===
     property bool is24Hour: true
@@ -158,43 +161,42 @@ Item {
     // 内容布局
     Row {
         anchors.fill: parent
-        anchors.margins: 12
-        spacing: 36
+        anchors.margins: 8
+        spacing: Math.min(30, parent.width * 0.15)
 
         // 左侧大时间
         Row {
             id: timeRow
-            spacing: 8
-            width: parent.width - rightColumn.width - 24
+            spacing: Math.max(4, parent.width * 0.03)
+            width: parent.width - rightColumn.width
             anchors.verticalCenter: parent.verticalCenter
 
             Text {
                 text: hourStr(now)
                 color: accentColor
-                font.pixelSize: 54
+                font.pixelSize: Math.min(timeFontSize, root.height * 0.5)
                 font.bold: true
                 verticalAlignment: Text.AlignVCenter
             }
             Text {
                 text: ":"
                 color: theme.textColor
-                font.pixelSize: 54
+                font.pixelSize: Math.min(timeFontSize, root.height * 0.5)
                 font.bold: true
                 verticalAlignment: Text.AlignVCenter
             }
             Text {
                 text: minuteStr(now)
                 color: theme.textColor
-                font.pixelSize: 54
+                font.pixelSize: Math.min(timeFontSize, root.height * 0.5)
                 font.bold: true
                 verticalAlignment: Text.AlignVCenter
             }
-            // 可选秒
             Text {
                 visible: showSeconds
                 text: ":" + secondStr(now)
                 color: theme.textColor
-                font.pixelSize: 36
+                font.pixelSize: Math.min(timeFontSize * 0.67, root.height * 0.33)
                 font.bold: true
                 verticalAlignment: Text.AlignVCenter
                 anchors.verticalCenter: parent.verticalCenter
@@ -204,23 +206,24 @@ Item {
         // 右侧天气与日期
         Column {
             id: rightColumn
-            spacing: 6
-            width: 110
+            spacing: Math.max(2, root.height * 0.06)
+            width: showSeconds ? Math.max(60, root.width * 0.28) : Math.max(80, root.width * 0.35)
             anchors.verticalCenter: parent.verticalCenter
+            anchors.rightMargin: 10
 
             Row {
-                spacing: 6
+                spacing: Math.max(2, root.width * 0.02)
                 visible: weatherVisible
                 Text {
                     text: weatherIcon
                     font.family: iconFont.name
-                    font.pixelSize: 16
+                    font.pixelSize: Math.min(iconFontSize, root.height * 0.2)
                     color: theme.textColor
                     verticalAlignment: Text.AlignVCenter
                 }
                 Text {
                     text: temperature + "°"
-                    font.pixelSize: 14
+                    font.pixelSize: Math.min(dateFontSize + 2, root.height * 0.14)
                     color: theme.textColor
                     verticalAlignment: Text.AlignVCenter
                 }
@@ -229,7 +232,7 @@ Item {
             Text {
                 text: dateLine
                 color: theme.textColor
-                font.pixelSize: 12
+                font.pixelSize: Math.min(dateFontSize, root.height * 0.12)
             }
         }
     }
