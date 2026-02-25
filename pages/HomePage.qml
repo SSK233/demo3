@@ -77,29 +77,6 @@ Page {
         }
     }
 
-    ERadioButton {
-        id: voltageSelector
-        model: [
-            { text: "AC400V" },
-            { text: "AC/DC230V" },
-            { text: "DC460V" },
-            { text: "DC690V" }
-        ]
-        selectedIndices: [0]
-        containerColor: theme.secondaryColor
-        textColor: theme.textColor
-        fontSize: 14
-        buttonHeight: 36
-        radius: 18
-        shadowEnabled: true
-        anchors.top: clockCard.bottom
-        anchors.topMargin: 30
-        anchors.left: parent.left
-        anchors.leftMargin: 16
-        enabled: !stepRunActive
-        opacity: stepRunActive ? 0.5 : 1.0
-    }
-
     /**
      * @brief 更新串口下拉框数据模型
      * 将串口管理器返回的端口列表转换为下拉框可用的格式
@@ -146,11 +123,38 @@ Page {
         }
     }
 
+    EDropdown {
+        id: voltageSelector
+        z: 7
+        title: "选择电压"
+        model: [
+            { text: "AC400V" },
+            { text: "AC/DC230V" },
+            { text: "DC460V" },
+            { text: "DC690V" }
+        ]
+        selectedIndex: -1
+        containerColor: theme.secondaryColor
+        textColor: theme.textColor
+        fontSize: 14
+        radius: 20
+        headerHeight: 40
+        shadowEnabled: true
+        anchors.top: fanSwitch.bottom
+        anchors.topMargin: 16
+        anchors.right: parent.right
+        anchors.rightMargin: 16
+        width: fanSwitch.width
+        enabled: !stepRunActive
+        opacity: stepRunActive ? 0.5 : 1.0
+    }
+
     EHoverCard {
         id: runTimeCard
+        z: 1
         width: fanSwitch.width
         height: 160
-        anchors.top: fanSwitch.bottom
+        anchors.top: voltageSelector.bottom
         anchors.topMargin: 16
         anchors.right: parent.right
         anchors.rightMargin: 16
@@ -205,7 +209,7 @@ Page {
      */
     ECard {
         id: fanStatusIndicator
-        width: 140
+        width: fanSwitch.width
         height: 40
         cardColor: theme.secondaryColor
         radius: 20
@@ -245,7 +249,7 @@ Page {
      */
     ECard {
         id: highTempIndicator
-        width: 160
+        width: fanSwitch.width
         height: 40
         cardColor: theme.secondaryColor
         radius: 20
@@ -309,6 +313,7 @@ Page {
         textColor: theme.textColor         // 文字颜色（自适应深色模式）
         iconColor: theme.textColor         // 图标颜色（自适应深色模式）
         shadowEnabled: true                // 启用阴影效果
+        width: fanSwitch.width
         anchors.top: parent.top
         anchors.topMargin: 20
         anchors.right: parent.right
@@ -325,9 +330,9 @@ Page {
      */
     EDropdown {
         id: serialPortDropdown
-        z: 3
+        z: 10
         title: "选择串口"                   // 默认提示文字
-        width: 140                          // 宽度
+        width: fanSwitch.width                          // 宽度
         headerHeight: 40                    // 头部高度（与按钮一致）
         radius: 20                          // 圆角半径
         containerColor: theme.secondaryColor // 背景颜色
@@ -349,9 +354,9 @@ Page {
      */
     EDropdown {
         id: baudRateDropdown
-        z: 2
+        z: 9
         title: "波特率"
-        width: 140
+        width: fanSwitch.width
         headerHeight: 40
         radius: 20
         containerColor: theme.secondaryColor
@@ -383,9 +388,9 @@ Page {
      */
     EDropdown {
         id: parityDropdown
-        z: 1
+        z: 8
         title: "校验位"
-        width: 140
+        width: fanSwitch.width
         headerHeight: 40
         radius: 20
         containerColor: theme.secondaryColor
@@ -412,7 +417,6 @@ Page {
      */
     ESwitchButton {
         id: serialPortSwitch
-        z: -1                               // 确保下拉框展开时不会被遮挡
         text: "串口开关"
         size: "s"                          // 小号尺寸
         containerColor: theme.secondaryColor // 背景颜色
@@ -459,7 +463,6 @@ Page {
      */
     EHoverCard {
         id: electricCard
-        z: -1
         width: 420
         height: 220
         anchors.centerIn: parent

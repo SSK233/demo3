@@ -30,6 +30,9 @@ Page {
     // 是否正在执行分步运行
     property bool isRunning: false
 
+    // 是否正在循环运行
+    property bool isLooping: false
+
     // 当前步骤剩余时间（秒）
     property int remainingTime: 0
 
@@ -96,8 +99,15 @@ Page {
                     currentStepIndex++
                     startStep(currentStepIndex)
                 } else {
-                    // 所有步骤执行完毕，停止运行
-                    stopRun()
+                    // 所有步骤执行完毕
+                    if (isLooping) {
+                        // 循环模式：从第一个步骤重新开始
+                        currentStepIndex = 0
+                        startStep(0)
+                    } else {
+                        // 普通模式：停止运行
+                        stopRun()
+                    }
                 }
             }
         }
@@ -137,6 +147,7 @@ Page {
     // 停止分步运行
     function stopRun() {
         isRunning = false
+        isLooping = false
         currentStepIndex = -1
         remainingTime = 0
         // 停止定时器
@@ -150,6 +161,25 @@ Page {
             modbusManager.writeUnload()
         }
         console.log("分步运行停止")
+    }
+
+    // 循环分步运行
+    function loopRun() {
+        if (stepModel.count === 0) return
+
+        // 设置首页的分步运行模式状态，禁用首页的功率控制
+        if (homePage) {
+            homePage.stepRunActive = true
+        }
+        // 更新运行状态
+        isRunning = true
+        isLooping = true
+        currentStepIndex = 0
+        totalElapsedTime = 0
+        // 开始执行第一个步骤
+        startStep(0)
+        // 启动定时器
+        runTimer.running = true
     }
 
     // 退出页面时的清理操作
@@ -402,7 +432,7 @@ Page {
                 EButton {
                     id: startButton
                     text: "开始运行"
-                    size: "m"
+                    size: "s"
                     containerColor: theme.isDark ? "#66BB6A" : "#4CAF50"
                     textColor: "white"
                     iconCharacter: "\uf04b"
@@ -415,7 +445,7 @@ Page {
                 EButton {
                     id: stopButton
                     text: "停止"
-                    size: "m"
+                    size: "s"
                     containerColor: theme.isDark ? "#EF5350" : "#F44336"
                     textColor: "white"
                     iconCharacter: "\uf04d"
@@ -423,6 +453,21 @@ Page {
                     enabled: isRunning
                     onClicked: {
                         stopRun()
+                    }
+                }
+
+                // 循环运行按钮
+                EButton {
+                    id: loopButton
+                    text: "循环运行"
+                    size: "s"
+                    containerColor: theme.isDark ? "#42A5F5" : "#2196F3"
+                    textColor: "white"
+                    iconCharacter: "\uf01e"
+                    iconColor: "white"
+                    enabled: !isRunning
+                    onClicked: {
+                        loopRun()
                     }
                 }
             }
