@@ -586,35 +586,34 @@ Page {
     }
 
     /**
-     * @brief 电压电流输入区域
-     * 包含电压和电流输入框，上下排列
+     * @brief 功率输入区域
+     * 包含A、B、C三相功率输入框，平行排列
      */
-    Column {
-        id: inputColumn
-        spacing: 16
-        anchors.left: parent.left
-        anchors.leftMargin: 16
-        anchors.verticalCenter: parent.verticalCenter
+    Row {
+        id: inputRow
+        spacing: 24
+        anchors.top: electricCard.bottom
+        anchors.topMargin: 16
+        anchors.horizontalCenter: parent.horizontalCenter
 
         Column {
             spacing: 8
-            anchors.horizontalCenter: parent.horizontalCenter
 
             Text {
-                text: "输入电压/V"
+                text: "A相功率/kW"
                 color: theme.textColor
                 font.pixelSize: 14
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
             EInput {
-                id: voltageInput
+                id: powerAInput
                 placeholderText: ""
                 width: 120
                 height: 50
                 radius: 25
                 onTextChanged: {
-                    var text = voltageInput.text
+                    var text = powerAInput.text
                     var filtered = ""
                     var dotFound = false
                     var decimalCount = 0
@@ -631,23 +630,7 @@ Page {
                         }
                     }
                     if (filtered !== text) {
-                        voltageInput.text = filtered
-                    }
-                    var voltageValue = parseFloat(filtered)
-                    if (!isNaN(voltageValue)) {
-                        if (voltageValue > 1000) {
-                            voltageInput.text = "1000.0"
-                            voltageValue = 1000
-                        }
-                        var currentValue = parseFloat(currentInput.text)
-                        if (!isNaN(currentValue) && currentValue > 0) {
-                            var power = voltageValue * currentValue
-                            if (power > 30000) {
-                                var maxVoltage = Math.floor(30000 / currentValue * 10) / 10
-                                voltageInput.text = maxVoltage.toFixed(1)
-                                powerWarningDialog.open()
-                            }
-                        }
+                        powerAInput.text = filtered
                     }
                 }
             }
@@ -655,23 +638,22 @@ Page {
 
         Column {
             spacing: 8
-            anchors.horizontalCenter: parent.horizontalCenter
 
             Text {
-                text: "输入电流/A"
+                text: "B相功率/kW"
                 color: theme.textColor
                 font.pixelSize: 14
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
             EInput {
-                id: currentInput
+                id: powerBInput
                 placeholderText: ""
                 width: 120
                 height: 50
                 radius: 25
                 onTextChanged: {
-                    var text = currentInput.text
+                    var text = powerBInput.text
                     var filtered = ""
                     var dotFound = false
                     var decimalCount = 0
@@ -688,23 +670,47 @@ Page {
                         }
                     }
                     if (filtered !== text) {
-                        currentInput.text = filtered
+                        powerBInput.text = filtered
                     }
-                    var currentValue = parseFloat(filtered)
-                    if (!isNaN(currentValue)) {
-                        if (currentValue > 300) {
-                            currentInput.text = "300.0"
-                            currentValue = 300
-                        }
-                        var voltageValue = parseFloat(voltageInput.text)
-                        if (!isNaN(voltageValue) && voltageValue > 0) {
-                            var power = voltageValue * currentValue
-                            if (power > 30000) {
-                                var maxCurrent = Math.floor(30000 / voltageValue * 10) / 10
-                                currentInput.text = maxCurrent.toFixed(1)
-                                powerWarningDialog.open()
+                }
+            }
+        }
+
+        Column {
+            spacing: 8
+
+            Text {
+                text: "C相功率/kW"
+                color: theme.textColor
+                font.pixelSize: 14
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            EInput {
+                id: powerCInput
+                placeholderText: ""
+                width: 120
+                height: 50
+                radius: 25
+                onTextChanged: {
+                    var text = powerCInput.text
+                    var filtered = ""
+                    var dotFound = false
+                    var decimalCount = 0
+                    for (var i = 0; i < text.length; i++) {
+                        var ch = text.charAt(i)
+                        if (ch >= '0' && ch <= '9') {
+                            if (!dotFound || decimalCount < 1) {
+                                filtered += ch
+                                if (dotFound) decimalCount++
                             }
+                        } else if (ch === '.' && !dotFound) {
+                            filtered += ch
+                            dotFound = true
                         }
+                    }
+                    if (filtered !== text) {
+                        powerCInput.text = filtered
                     }
                 }
             }
@@ -729,16 +735,22 @@ Page {
         anchors.left: parent.left
         anchors.leftMargin: 16
         onClicked: {
-            voltageInput.focus = false
-            currentInput.focus = false
+            powerAInput.focus = false
+            powerBInput.focus = false
+            powerCInput.focus = false
 
-            var voltageValue = parseFloat(voltageInput.text)
-            var currentValue = parseFloat(currentInput.text)
-            if (!isNaN(voltageValue) && !isNaN(currentValue)) {
-                loadConfirmDialog.message = "确定要载入以下数值？\n电压: " + voltageValue + " V\n电流: " + currentValue + " A"
+            var powerA = parseFloat(powerAInput.text)
+            var powerB = parseFloat(powerBInput.text)
+            var powerC = parseFloat(powerCInput.text)
+            if (!isNaN(powerA) || !isNaN(powerB) || !isNaN(powerC)) {
+                var message = "确定要载入以下数值？\n"
+                if (!isNaN(powerA)) message += "A相功率: " + powerA + " kW\n"
+                if (!isNaN(powerB)) message += "B相功率: " + powerB + " kW\n"
+                if (!isNaN(powerC)) message += "C相功率: " + powerC + " kW"
+                loadConfirmDialog.message = message
                 loadConfirmDialog.open()
             } else {
-                console.log("请输入有效的电压和电流值")
+                console.log("请输入有效的功率值")
             }
         }
     }
@@ -751,10 +763,11 @@ Page {
         confirmText: "确定"
         cancelText: "取消"
         onConfirm: {
-            var voltageValue = parseFloat(voltageInput.text)
-            var currentValue = parseFloat(currentInput.text)
-            modbusManager.writeVoltageAndCurrent(voltageValue, currentValue)
-            console.log("载入: 电压 -> 寄存器50, 电流 -> 寄存器51 (单次发送)")
+            var powerA = parseFloat(powerAInput.text)
+            var powerB = parseFloat(powerBInput.text)
+            var powerC = parseFloat(powerCInput.text)
+            modbusManager.writePower(powerA, powerB, powerC)
+            console.log("载入: A相功率 -> 寄存器50, B相功率 -> 寄存器51, C相功率 -> 寄存器52")
         }
     }
 

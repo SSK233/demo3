@@ -26,29 +26,6 @@ Page {
         iconRotateOnClick: true
         onClicked: theme.toggleTheme()
         }
-
-        ESlider {
-            id: animSlider
-            width: 280
-            text: "动画时长"
-            itemSpacing: 10
-            minimumValue: 300
-            maximumValue: 3000
-            decimals: 0
-            stepSize: 50
-            valueSuffix: "ms"
-            value: animWindowRef ? animWindowRef.animDuration : 450
-            onUserValueChanged: function(value) {
-                if (animWindowRef) animWindowRef.animDuration = Math.round(value)
-            }
-        }
-    }
-
-    
-
-    Connections {
-        target: animWindowRef
-        function onAnimDurationChanged() { animSlider.value = animWindowRef.animDuration }
     }
 
     
