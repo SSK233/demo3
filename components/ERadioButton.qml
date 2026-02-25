@@ -25,7 +25,7 @@ Rectangle {
     property color shadowColor: theme.shadowColor
 
     // 布局尺寸
-    property int horizontalPadding: 24
+    property int horizontalPadding: 19
     property int boxSize: 24
     property int labelSpacing: 12
     property int buttonsSpacing: 6
@@ -36,6 +36,7 @@ Rectangle {
         id: measureText
         visible: false
         font.pixelSize: root.fontSize
+        font.bold: true
     }
 
     property real maxTextWidth: 0
@@ -50,6 +51,7 @@ Rectangle {
     }
     Component.onCompleted: updateMaxTextWidth()
     onModelChanged: updateMaxTextWidth()
+    onFontSizeChanged: updateMaxTextWidth()
 
     // === 尺寸计算 ===
     implicitWidth: horizontalPadding * 2 + boxSize + labelSpacing + maxTextWidth + 30
@@ -97,7 +99,7 @@ Rectangle {
 
         delegate: Rectangle {
             id: btn
-            implicitWidth: horizontalPadding * 2 + boxSize + labelSpacing + label.implicitWidth + 10
+            implicitWidth: horizontalPadding * 2 + boxSize + labelSpacing + root.maxTextWidth + 10
             height: buttonHeight
             radius: root.radius * 0.5
 
@@ -163,8 +165,9 @@ Rectangle {
                     font.pixelSize: root.fontSize
                     font.bold: checked
                     elide: Text.ElideRight
-                    Layout.preferredWidth: label.implicitWidth
+                    Layout.preferredWidth: root.maxTextWidth
                     Layout.alignment: Qt.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
                 }
             }
 

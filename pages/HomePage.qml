@@ -75,6 +75,27 @@ Page {
         }
     }
 
+    ERadioButton {
+        id: voltageSelector
+        model: [
+            { text: "AC400V" },
+            { text: "AC/DC230V" },
+            { text: "DC460V" },
+            { text: "DC690V" }
+        ]
+        selectedIndices: [0]
+        containerColor: theme.secondaryColor
+        textColor: theme.textColor
+        fontSize: 14
+        buttonHeight: 36
+        radius: 18
+        shadowEnabled: true
+        anchors.top: clockCard.bottom
+        anchors.topMargin: 30
+        anchors.left: parent.left
+        anchors.leftMargin: 16
+    }
+
     /**
      * @brief 更新串口下拉框数据模型
      * 将串口管理器返回的端口列表转换为下拉框可用的格式
@@ -259,6 +280,7 @@ Page {
      * 使用网络天气，图标随天气自动切换
      */
     EClockCard {
+        id: clockCard
         useNetworkWeather: true
         weatherApiKey: "SLKpiXphkV7ch3vZp"
         weatherLocation: "ip"
@@ -437,6 +459,7 @@ Page {
         width: 420                              // 卡片宽度
         height: 220                             // 卡片高度
         anchors.centerIn: parent                // 居中对齐
+        anchors.horizontalCenterOffset: 10     // 向右移动10像素
         anchors.verticalCenterOffset: -40       // 向上移动
 
         // === 内容布局：网格排列三相数据 ===
@@ -649,6 +672,7 @@ Page {
         anchors.top: electricCard.bottom
         anchors.topMargin: 26
         anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenterOffset: 10
 
         Column {
             spacing: 8
@@ -777,6 +801,7 @@ Page {
         anchors.top: inputRow.bottom
         anchors.topMargin: 26
         anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenterOffset: 10
 
         EButton {
             id: loadButton
