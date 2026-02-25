@@ -17,18 +17,21 @@ ApplicationWindow {
 
     // 窗口最小宽度：
     minimumWidth: 1020
-    
+
     // 窗口初始高度：540像素（16:9标准宽高比）
     height: 600
-    
+
     // 窗口启动时立即显示
     visible: true
-    
+
     // 窗口标题栏显示的文本内容
     title: "负载箱测试3"
 
     // 窗口背景色使用主题定义的主色调
     color: theme.primaryColor
+
+    // 分步运行模式状态 - 与首页功率设置互斥
+    property bool stepRunActive: false
 
     // 字体加载器 - 用于加载Font Awesome图标字体
     FontLoader {
@@ -103,21 +106,27 @@ ApplicationWindow {
             // 导航列表模型 - 定义导航菜单项数据
             ListModel {
                 id: navModel  // 列表模型的唯一标识符
-                
+
                 // 导航菜单项：首页
-                ListElement { 
+                ListElement {
                     display: "首页"  // 显示文本
                     iconChar: "\uf015"  // Font Awesome图标字符（home图标）
                 }
-                
+
+                // 导航菜单项：分步运行
+                ListElement {
+                    display: "分步"  // 显示文本
+                    iconChar: "\uf017"  // Font Awesome图标字符（clock图标）
+                }
+
                 // 导航菜单项：波形图
                 ListElement {
                     display: "波形图"  // 显示文本
                     iconChar: "\uf201"  // Font Awesome图标字符（波形图图标）
                 }
-                
+
                 // 导航菜单项：设置
-                ListElement { 
+                ListElement {
                     display: "设置"  // 显示文本
                     iconChar: "\uf013"  // Font Awesome图标字符（cog图标）
                 }
@@ -206,6 +215,44 @@ ApplicationWindow {
                 
                 // 首页组件 - 填充整个容器
                 HomePage { id: homePage; anchors.fill: parent }
+            }
+
+            // 分步运行页容器 - 包含StepRunPage组件
+            Item {
+                // 水平方向填充布局
+                Layout.fillWidth: true
+
+                // 垂直方向填充布局
+                Layout.fillHeight: true
+
+                // 透明度 - 根据可见性动态调整（用于页面切换动画）
+                opacity: visible ? 1 : 0
+
+                // Y轴位置 - 根据可见性动态调整（用于页面切换动画）
+                y: visible ? 0 : 12
+
+                // 透明度变化动画
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 240
+                        easing.type: Easing.OutCubic
+                    }
+                }
+
+                // Y轴位置变化动画
+                Behavior on y {
+                    NumberAnimation {
+                        duration: 240
+                        easing.type: Easing.OutCubic
+                    }
+                }
+
+                // 分步运行页组件 - 填充整个容器
+                StepRunPage {
+                    id: stepRunPage
+                    anchors.fill: parent
+                    homePage: homePage
+                }
             }
 
             // 波形图页容器 - 包含WaveformPage组件

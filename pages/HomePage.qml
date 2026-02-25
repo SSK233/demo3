@@ -23,6 +23,9 @@ Page {
     /** @brief 当前选中的串口索引，-1表示未选中 */
     property int selectedSerialPortIndex: -1
 
+    /** @brief 分步运行模式状态 - 引用Main.qml中的全局属性 */
+    property bool stepRunActive: parent && parent.parent && parent.parent.hasOwnProperty("stepRunActive") ? parent.parent.stepRunActive : false
+
     /**
      * @brief 串口管理器
      * 负责串口通信的底层操作，包括端口刷新、打开、关闭等
@@ -41,7 +44,6 @@ Page {
         }
     }
 
-    
     /**
      * @brief Modbus管理器
      * 负责Modbus RTU通信，读取电压、电流、功率数据
@@ -94,6 +96,8 @@ Page {
         anchors.topMargin: 30
         anchors.left: parent.left
         anchors.leftMargin: 16
+        enabled: !stepRunActive
+        opacity: stepRunActive ? 0.5 : 1.0
     }
 
     /**
@@ -456,11 +460,12 @@ Page {
     EHoverCard {
         id: electricCard
         z: -1
-        width: 420                              // 卡片宽度
-        height: 220                             // 卡片高度
-        anchors.centerIn: parent                // 居中对齐
-        anchors.horizontalCenterOffset: 10     // 向右移动10像素
-        anchors.verticalCenterOffset: -40       // 向上移动
+        width: 420
+        height: 220
+        anchors.centerIn: parent
+        anchors.horizontalCenterOffset: 10
+        anchors.verticalCenterOffset: -40
+        visible: !stepRunActive
 
         // === 内容布局：网格排列三相数据 ===
         GridLayout {
@@ -667,12 +672,37 @@ Page {
      * 包含A、B、C三相功率输入框，平行排列
      */
     Row {
+        id: stepRunTipRow
+        spacing: 8
+        anchors.top: electricCard.bottom
+        anchors.topMargin: 26
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenterOffset: 10
+        visible: stepRunActive
+
+        Rectangle {
+            width: 16
+            height: 16
+            radius: 8
+            color: theme.isDark ? "#FF9800" : "#FF9800"
+        }
+
+        Text {
+            text: "分步运行模式已启用，功率由分步运行控制"
+            color: theme.isDark ? "#FF9800" : "#FF9800"
+            font.pixelSize: 14
+            font.bold: true
+        }
+    }
+
+    Row {
         id: inputRow
         spacing: 24
         anchors.top: electricCard.bottom
         anchors.topMargin: 26
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: 10
+        visible: !stepRunActive
 
         Column {
             spacing: 8
@@ -690,6 +720,8 @@ Page {
                 width: 120
                 height: 50
                 radius: 25
+                enabled: !stepRunActive
+                opacity: stepRunActive ? 0.5 : 1.0
                 onTextChanged: {
                     var text = powerAInput.text
                     var filtered = ""
@@ -730,6 +762,8 @@ Page {
                 width: 120
                 height: 50
                 radius: 25
+                enabled: !stepRunActive
+                opacity: stepRunActive ? 0.5 : 1.0
                 onTextChanged: {
                     var text = powerBInput.text
                     var filtered = ""
@@ -770,6 +804,8 @@ Page {
                 width: 120
                 height: 50
                 radius: 25
+                enabled: !stepRunActive
+                opacity: stepRunActive ? 0.5 : 1.0
                 onTextChanged: {
                     var text = powerCInput.text
                     var filtered = ""
@@ -802,6 +838,7 @@ Page {
         anchors.topMargin: 26
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: 10
+        visible: !stepRunActive
 
         EButton {
             id: loadButton
@@ -812,6 +849,8 @@ Page {
             textColor: theme.textColor
             iconColor: theme.textColor
             shadowEnabled: true
+            enabled: !stepRunActive
+            opacity: stepRunActive ? 0.5 : 1.0
             onClicked: {
                 powerAInput.focus = false
                 powerBInput.focus = false
@@ -842,6 +881,8 @@ Page {
             textColor: theme.textColor
             iconColor: theme.textColor
             shadowEnabled: true
+            enabled: !stepRunActive
+            opacity: stepRunActive ? 0.5 : 1.0
             onClicked: {
                 unloadConfirmDialog.open()
             }

@@ -29,6 +29,7 @@ qt_add_qml_module(demo3
                 pages/HomePage.qml
                 pages/WaveformPage.qml
                 pages/SettingsPage.qml
+                pages/StepRunPage.qml
                 ${QML_COMPONENTS}
 )
 
