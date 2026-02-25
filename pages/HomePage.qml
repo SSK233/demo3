@@ -121,6 +121,59 @@ Page {
         }
     }
 
+    EHoverCard {
+        id: runTimeCard
+        width: fanSwitch.width
+        height: 160
+        anchors.top: fanSwitch.bottom
+        anchors.topMargin: 16
+        anchors.right: parent.right
+        anchors.rightMargin: 16
+
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 8
+            spacing: 10
+
+            Text {
+                text: "累计运行时间"
+                color: theme.textColor
+                font.pixelSize: 12
+                Layout.alignment: Qt.AlignHCenter
+            }
+
+            Text {
+                text: "12345 秒"
+                color: theme.textColor
+                font.pixelSize: 14
+                font.bold: true
+                Layout.alignment: Qt.AlignHCenter
+            }
+
+            Rectangle {
+                Layout.preferredWidth: parent.width
+                Layout.preferredHeight: 1
+                color: theme.textColor
+                opacity: 0.3
+            }
+
+            Text {
+                text: "本次运行时间"
+                color: theme.textColor
+                font.pixelSize: 12
+                Layout.alignment: Qt.AlignHCenter
+            }
+
+            Text {
+                text: "3600 秒"
+                color: theme.textColor
+                font.pixelSize: 14
+                font.bold: true
+                Layout.alignment: Qt.AlignHCenter
+            }
+        }
+    }
+
     /**
      * @brief 风机状态指示灯
      * 显示风机的实际开关状态（读取从站1寄存器2）
