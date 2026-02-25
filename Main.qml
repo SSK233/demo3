@@ -19,7 +19,7 @@ ApplicationWindow {
     minimumWidth: 1020
     
     // 窗口初始高度：540像素（16:9标准宽高比）
-    height: 540
+    height: 600
     
     // 窗口启动时立即显示
     visible: true

@@ -4,7 +4,7 @@ import QtQuick
 QtObject {
     id: theme
 
-    property bool isDark: false
+    property bool isDark: true
 
     // === 全局动画窗口状态聚合 ===
     // 当前打开的动画窗口数量（由各 EAnimatedWindow 自动维护）

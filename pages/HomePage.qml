@@ -384,6 +384,7 @@ Page {
         width: 420                              // 卡片宽度
         height: 220                             // 卡片高度
         anchors.centerIn: parent                // 居中对齐
+        anchors.verticalCenterOffset: -40       // 向上移动
 
         // === 内容布局：网格排列三相数据 ===
         GridLayout {
@@ -593,7 +594,7 @@ Page {
         id: inputRow
         spacing: 24
         anchors.top: electricCard.bottom
-        anchors.topMargin: 16
+        anchors.topMargin: 26
         anchors.horizontalCenter: parent.horizontalCenter
 
         Column {
@@ -717,40 +718,54 @@ Page {
         }
     }
 
-    /**
-     * @brief 载入按钮
-     * 将滑块当前值应用到设备
-     */
-    EButton {
-        id: loadButton
-        text: "载入"
-        iconCharacter: "\uf019"
-        size: "s"
-        containerColor: theme.secondaryColor
-        textColor: theme.textColor
-        iconColor: theme.textColor
-        shadowEnabled: true
-        anchors.bottom: unloadButton.top
-        anchors.bottomMargin: 16
-        anchors.left: parent.left
-        anchors.leftMargin: 16
-        onClicked: {
-            powerAInput.focus = false
-            powerBInput.focus = false
-            powerCInput.focus = false
+    Row {
+        id: buttonRow
+        spacing: 24
+        anchors.top: inputRow.bottom
+        anchors.topMargin: 26
+        anchors.horizontalCenter: parent.horizontalCenter
 
-            var powerA = parseFloat(powerAInput.text)
-            var powerB = parseFloat(powerBInput.text)
-            var powerC = parseFloat(powerCInput.text)
-            if (!isNaN(powerA) || !isNaN(powerB) || !isNaN(powerC)) {
-                var message = "确定要载入以下数值？\n"
-                if (!isNaN(powerA)) message += "A相功率: " + powerA + " kW\n"
-                if (!isNaN(powerB)) message += "B相功率: " + powerB + " kW\n"
-                if (!isNaN(powerC)) message += "C相功率: " + powerC + " kW"
-                loadConfirmDialog.message = message
-                loadConfirmDialog.open()
-            } else {
-                console.log("请输入有效的功率值")
+        EButton {
+            id: loadButton
+            text: "载入"
+            iconCharacter: "\uf019"
+            size: "s"
+            containerColor: theme.secondaryColor
+            textColor: theme.textColor
+            iconColor: theme.textColor
+            shadowEnabled: true
+            onClicked: {
+                powerAInput.focus = false
+                powerBInput.focus = false
+                powerCInput.focus = false
+
+                var powerA = parseFloat(powerAInput.text)
+                var powerB = parseFloat(powerBInput.text)
+                var powerC = parseFloat(powerCInput.text)
+                if (!isNaN(powerA) || !isNaN(powerB) || !isNaN(powerC)) {
+                    var message = "确定要载入以下数值？\n"
+                    if (!isNaN(powerA)) message += "A相功率: " + powerA + " kW\n"
+                    if (!isNaN(powerB)) message += "B相功率: " + powerB + " kW\n"
+                    if (!isNaN(powerC)) message += "C相功率: " + powerC + " kW"
+                    loadConfirmDialog.message = message
+                    loadConfirmDialog.open()
+                } else {
+                    console.log("请输入有效的功率值")
+                }
+            }
+        }
+
+        EButton {
+            id: unloadButton
+            text: "卸载"
+            iconCharacter: "\uf1f8"
+            size: "s"
+            containerColor: theme.secondaryColor
+            textColor: theme.textColor
+            iconColor: theme.textColor
+            shadowEnabled: true
+            onClicked: {
+                unloadConfirmDialog.open()
             }
         }
     }
@@ -768,28 +783,6 @@ Page {
             var powerC = parseFloat(powerCInput.text)
             modbusManager.writePower(powerA, powerB, powerC)
             console.log("载入: A相功率 -> 寄存器50, B相功率 -> 寄存器51, C相功率 -> 寄存器52")
-        }
-    }
-
-    /**
-     * @brief 卸载按钮
-     * 清除/重置电流设置
-     */
-    EButton {
-        id: unloadButton
-        text: "卸载"
-        iconCharacter: "\uf1f8"
-        size: "s"
-        containerColor: theme.secondaryColor
-        textColor: theme.textColor
-        iconColor: theme.textColor
-        shadowEnabled: true
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 16
-        anchors.left: parent.left
-        anchors.leftMargin: 16
-        onClicked: {
-            unloadConfirmDialog.open()
         }
     }
 
